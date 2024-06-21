@@ -182,6 +182,6 @@ if __name__ == "__main__":
         index_filename=steam_index,
         columns=steam_columns,
         begin=index,
-        end=index + 10,
+        end=index + 20000,
         batchsize=5,
     )
