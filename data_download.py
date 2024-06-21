@@ -1,10 +1,13 @@
+import argparse
+import csv
 import datetime as dt
 import os
 import statistics
 import time
+
 import numpy as np
 import pandas as pd
-import csv
+
 from id_collection import get_request
 
 
@@ -84,44 +87,52 @@ def process_batches(
         stop = batches[i + 1]
 
         app_data = get_app_data(start, stop, parser, pause)
-        rel_path = os.path.join(download_path, data_filename)
 
-        with open(rel_path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
+        if app_data:
+            rel_path = os.path.join(download_path, data_filename)
 
-            for j in range(3, 0, -1):
-                print("\rAbout to write data, don't stop script! ({})".format(j), end="")
-                time.sleep(0.5)
+            with open(rel_path, "a", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
 
-            writer.writerows(app_data)
-            print("\rExported lines {}-{} to {}.".format(start, stop - 1, data_filename), end=" ")
+                for j in range(3, 0, -1):
+                    print("\rAbout to write data, don't stop script! ({})".format(j), end="")
+                    time.sleep(0.5)
 
-        apps_written += len(app_data)
+                writer.writerows(app_data)
+                print("\rExported lines {}-{} to {}.".format(start, stop - 1, data_filename), end=" ")
 
-        idx_path = os.path.join(download_path, index_filename)
+            apps_written += len(app_data)
 
-        with open(idx_path, "w") as f:
-            index = stop
-            print(index, file=f)
+            idx_path = os.path.join(download_path, index_filename)
 
-        end_time = time.time()
-        time_taken = end_time - start_time
+            with open(idx_path, "w") as f:
+                index = stop
+                print(index, file=f)
 
-        batch_times.append(time_taken)
-        mean_time = statistics.mean(batch_times)
+            end_time = time.time()
+            time_taken = end_time - start_time
 
-        est_remaining = (len(batches) - i - 2) * mean_time
+            batch_times.append(time_taken)
+            mean_time = statistics.mean(batch_times)
 
-        remaining_td = dt.timedelta(seconds=round(est_remaining))
-        time_td = dt.timedelta(seconds=round(time_taken))
-        mean_td = dt.timedelta(seconds=round(mean_time))
+            est_remaining = (len(batches) - i - 2) * mean_time
 
-        print("Batch {} time: {} (avg: {}, remaining: {})".format(i, time_td, mean_td, remaining_td))
+            remaining_td = dt.timedelta(seconds=round(est_remaining))
+            time_td = dt.timedelta(seconds=round(time_taken))
+            mean_td = dt.timedelta(seconds=round(mean_time))
+
+            print("Batch {} time: {} (avg: {}, remaining: {})".format(i, time_td, mean_td, remaining_td))
 
     print("\nProcessing batches complete. {} apps written".format(apps_written))
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Scrape Steam app data.")
+    parser.add_argument("--num_records", type=int, default=0, help="Number of records to scrape (0 for all).")
+    args = parser.parse_args()
+
+    num_records = args.num_records
+
     download_path = "./data/download"
     steam_app_data = "steam_app_data.csv"
     steam_index = "steam_index.txt"
@@ -170,6 +181,8 @@ if __name__ == "__main__":
     ]
 
     index = get_index(download_path, steam_index)
+    end = -1 if num_records == 0 else index + num_records
+
     prepare_data_file(download_path, steam_app_data, index, steam_columns)
 
     process_batches(
@@ -180,6 +193,6 @@ if __name__ == "__main__":
         index_filename=steam_index,
         columns=steam_columns,
         begin=index,
-        end=-1,
+        end=end,
         batchsize=5,
     )
