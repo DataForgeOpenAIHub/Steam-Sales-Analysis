@@ -171,7 +171,6 @@ if __name__ == "__main__":
 
     index = get_index(download_path, steam_index)
     prepare_data_file(download_path, steam_app_data, index, steam_columns)
-    prepare_data_file(download_path, steam_app_data, index, steam_columns)
 
     process_batches(
         parser=parse_steam_request,
