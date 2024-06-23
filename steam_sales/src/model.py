@@ -3,7 +3,7 @@ from sqlalchemy import Column, Float, Integer, String, Text
 from sqlalchemy.dialects.mysql import JSON
 
 
-class Game(Base):
+class GameDetails(Base):
     __tablename__ = "steamspy_games_raw"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -20,13 +20,13 @@ class Game(Base):
     average_2weeks = Column(Integer, nullable=False)
     median_forever = Column(Integer, nullable=False)
     median_2weeks = Column(Integer, nullable=False)
-    price = Column(Integer, nullable=False)
-    initialprice = Column(Integer, nullable=False)
-    discount = Column(String(255), nullable=False)
+    price = Column(Integer, nullable=True)
+    initialprice = Column(Integer, nullable=True)
+    discount = Column(String(255), nullable=True)
     ccu = Column(Integer, nullable=False)
-    languages = Column(Text, nullable=False)
+    languages = Column(Text, nullable=True)
     genre = Column(Text, nullable=False)
-    tags = Column(JSON, nullable=False)
+    tags = Column(JSON, nullable=True)
 
 
 class GameMeta(Base):

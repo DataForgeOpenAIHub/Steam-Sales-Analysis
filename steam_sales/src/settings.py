@@ -1,10 +1,10 @@
 import logging
 import os
+from pprint import pprint
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from rich.logging import RichHandler
-from pprint import pprint
 
 
 class Path:
@@ -14,6 +14,7 @@ class Path:
 
     env_file = os.path.join(root_dir, ".env")
     data_dir = os.path.join(root_dir, "data")
+    sql_queries = os.path.join(package_dir, "sql")
 
 
 class Settings(BaseSettings):

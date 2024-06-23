@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
-from typing import Dict, List
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel, Field, field_validator, validator
 
 
 class GameMetaData(BaseModel):
@@ -25,13 +26,29 @@ class GameDetails(BaseModel):
     average_2weeks: int = Field(..., description="The average playtime in the last 2 weeks in minutes")
     median_forever: int = Field(..., description="The median playtime forever in minutes")
     median_2weeks: int = Field(..., description="The median playtime in the last 2 weeks in minutes")
-    price: int = Field(..., description="The current price of the game in cents")
-    initialprice: int = Field(..., description="The initial price of the game in cents")
-    discount: str = Field(..., max_length=255, description="The discount on the game")
+    price: Optional[int] = Field(None, description="The current price of the game in cents")
+    initialprice: Optional[int] = Field(None, description="The initial price of the game in cents")
+    discount: Optional[str] = Field(None, max_length=255, description="The discount on the game")
     ccu: int = Field(..., description="The current concurrent users")
-    languages: str = Field(..., description="The supported languages")
+    languages: Optional[str] = Field(None, description="The supported languages")
     genre: str = Field(..., description="The genre of the game")
-    tags: Dict[str, int] = Field(..., description="The tags associated with the game")
+    tags: Optional[Dict[str, int]] = Field(None, description="The tags associated with the game")
+
+    @field_validator("tags", mode="before")
+    def validate_tags(cls, v):
+        if v == []:
+            return None
+        if v is not None and not isinstance(v, dict):
+            raise ValueError("tags must be a dictionary or None")
+        return v
+
+    @field_validator("score_rank", mode="before")
+    def validate_score_rank(cls, v):
+        if isinstance(v, int):
+            return str(v)
+        if v is not None and not isinstance(v, str):
+            raise ValueError("score_rank must be a string or an integer")
+        return v
 
 
 class GameDetailsList(BaseModel):

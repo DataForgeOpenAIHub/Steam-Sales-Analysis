@@ -1,11 +1,11 @@
 import time
+
 import requests
-from requests.exceptions import SSLError, RequestException
-from settings import config, get_logger
-from validation import GameMetaDataList
 from crud import bulk_ingest_meta_data
 from db import get_db
-
+from requests.exceptions import RequestException, SSLError
+from settings import config, get_logger
+from validation import GameMetaDataList
 
 logger = get_logger(__file__)
 
