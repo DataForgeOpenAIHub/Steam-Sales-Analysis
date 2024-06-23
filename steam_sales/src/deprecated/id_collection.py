@@ -33,7 +33,7 @@ def get_request(url: str, parameters=None, max_retries=5):
 
 if __name__ == "__main__":
     url = "https://steamspy.com/api.php"
-    app_id_path = "./data/download/app_list.csv"
+    app_id_path = "../data/download/app_list.csv"
 
     os.makedirs(os.path.dirname(app_id_path), exist_ok=True)
 

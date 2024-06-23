@@ -7,7 +7,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from id_collection import get_request
+from steam_sales.src.deprecated.id_collection import get_request
 
 
 def get_index(download_path: str, index_filename: str):
@@ -124,10 +124,10 @@ def process_batches(
 
 
 if __name__ == "__main__":
-    download_path = "./data/download"
+    download_path = "../data/download"
     steam_app_data = "steam_app_data.csv"
     steam_index = "steam_index.txt"
-    app_list = pd.read_csv("./data/download/app_list.csv")
+    app_list = pd.read_csv("../data/download/app_list.csv")
 
     steam_columns = [
         "type",
