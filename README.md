@@ -1,3 +1,3 @@
-# DS-Project
+# Steam Sales Analysis
+
 Working on it ....
-conda
