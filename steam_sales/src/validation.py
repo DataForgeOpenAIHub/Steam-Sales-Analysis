@@ -1,6 +1,8 @@
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field, field_validator, validator
+from pydantic import BaseModel, Field, field_validator, HttpUrl
+
+from datetime import datetime
 
 
 class GameMetaData(BaseModel):
@@ -12,6 +14,7 @@ class GameMetaDataList(BaseModel):
     games: List[GameMetaData] = Field(..., description="The list of games")
 
 
+# SteamSpy Game Details
 class GameDetails(BaseModel):
     appid: int = Field(..., description="The application ID")
     name: str = Field(..., max_length=255, description="The name of the game")
@@ -53,3 +56,61 @@ class GameDetails(BaseModel):
 
 class GameDetailsList(BaseModel):
     games: List[GameDetails] = Field(..., description="The list of games")
+
+
+# # Steam Game Details
+# class PCRequirements(BaseModel):
+#     os: str
+#     processor: str
+#     memory: str
+#     graphics: str
+#     directx: str = Field(None, alias="DirectX")
+#     storage: str
+#     sound_card: str = Field(None, alias="Sound Card")
+
+
+class PCRequirements(BaseModel):
+    minimum: Optional[str]
+    recommended: Optional[str]
+
+
+class ReleaseDate(BaseModel):
+    coming_soon: bool
+    date: Optional[datetime]
+
+    @field_validator("date", mode="before")
+    def validate_release_date(cls, v):
+        if isinstance(v, str):
+            return datetime.strptime(v, "%b %d, %Y")
+        if v is not None and not isinstance(v, str):
+            raise ValueError("date must be a string or an integer")
+        return v
+
+
+class Game(BaseModel):
+    type: str
+    name: str
+    appid: int
+    required_age: int
+    is_free: bool
+    controller_support: Optional[str]
+    dlc: Optional[List[int]]
+    detailed_description: str
+    about_the_game: str
+    short_description: str
+    supported_languages: str
+    header_image: HttpUrl
+    capsule_image: HttpUrl
+    website: HttpUrl
+    pc_requirements: PCRequirements
+    mac_requirements: PCRequirements = None
+    linux_requirements: PCRequirements = None
+    developers: List[str]
+    publishers: List[str]
+    platforms: Dict[str, bool]
+    metacritic: int
+    categories: list
+    genres: list
+    recommendations: int
+    achievements: int
+    release_date: ReleaseDate
