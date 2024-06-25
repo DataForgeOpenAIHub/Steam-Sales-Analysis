@@ -57,6 +57,8 @@ def text_parser(text: str):
         plain_text = soup.get_text(separator="\n", strip=True)
         return plain_text
 
+    return None
+
 
 def parse_game_data(data: dict):
     try:
@@ -71,10 +73,10 @@ def parse_game_data(data: dict):
             "is_free": data["is_free"],
             "controller_support": data.get("controller_support", None),
             "dlc": data.get("dlc", []),
-            "detailed_description": text_parser(data["detailed_description"]),
-            "short_description": text_parser(data["short_description"]),
-            "about_the_game": text_parser(data["about_the_game"]),
-            "supported_languages": text_parser(data["supported_languages"]),
+            "detailed_description": text_parser(data.get("detailed_description", None)),
+            "short_description": text_parser(data.get("short_description", None)),
+            "about_the_game": text_parser(data.get("about_the_game", None)),
+            "supported_languages": text_parser(data.get("supported_languages", None)),
             "reviews": text_parser(data.get("reviews", None)),
             "header_image": data["header_image"],
             "capsule_image": data["capsule_image"],
