@@ -1,10 +1,11 @@
+from datetime import datetime
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field, field_validator, HttpUrl
+from dateutil import parser
+from pydantic import BaseModel, Field, HttpUrl, field_validator
 
-from datetime import datetime
 
-
+# Game ID Details
 class GameMetaData(BaseModel):
     appid: int = Field(..., description="The application ID")
     name: str = Field(..., max_length=255, description="The name of the game")
@@ -41,76 +42,78 @@ class GameDetails(BaseModel):
     def validate_tags(cls, v):
         if v == []:
             return None
+
         if v is not None and not isinstance(v, dict):
             raise ValueError("tags must be a dictionary or None")
+
         return v
 
     @field_validator("score_rank", mode="before")
     def validate_score_rank(cls, v):
         if isinstance(v, int):
             return str(v)
+
         if v is not None and not isinstance(v, str):
             raise ValueError("score_rank must be a string or an integer")
+
         return v
 
 
 class GameDetailsList(BaseModel):
-    games: List[GameDetails] = Field(..., description="The list of games")
+    games: List[GameDetails] = Field(..., description="The list of SteamSpy games")
 
 
-# # Steam Game Details
-# class PCRequirements(BaseModel):
-#     os: str
-#     processor: str
-#     memory: str
-#     graphics: str
-#     directx: str = Field(None, alias="DirectX")
-#     storage: str
-#     sound_card: str = Field(None, alias="Sound Card")
-
-
+# Steam Game Details
 class PCRequirements(BaseModel):
-    minimum: Optional[str]
-    recommended: Optional[str]
-
-
-class ReleaseDate(BaseModel):
-    coming_soon: bool
-    date: Optional[datetime]
-
-    @field_validator("date", mode="before")
-    def validate_release_date(cls, v):
-        if isinstance(v, str):
-            return datetime.strptime(v, "%b %d, %Y")
-        if v is not None and not isinstance(v, str):
-            raise ValueError("date must be a string or an integer")
-        return v
+    minimum: Optional[Dict] = Field(..., description="")
+    recommended: Optional[Dict] = Field(..., description="")
 
 
 class Game(BaseModel):
-    type: str
-    name: str
-    appid: int
-    required_age: int
-    is_free: bool
-    controller_support: Optional[str]
-    dlc: Optional[List[int]]
-    detailed_description: str
-    about_the_game: str
-    short_description: str
-    supported_languages: str
-    header_image: HttpUrl
-    capsule_image: HttpUrl
-    website: HttpUrl
-    pc_requirements: PCRequirements
-    mac_requirements: PCRequirements = None
-    linux_requirements: PCRequirements = None
-    developers: List[str]
-    publishers: List[str]
-    platforms: Dict[str, bool]
-    metacritic: int
-    categories: list
-    genres: list
-    recommendations: int
-    achievements: int
-    release_date: ReleaseDate
+    type: str = Field(..., description="Type of the game")
+    name: str = Field(..., description="Name of the game")
+    appid: int = Field(..., description="Application ID of the game")
+    required_age: int = Field(..., description="Minimum required age to play the game.")
+    is_free: bool = Field(..., description="Indicates if the game is free to play")
+    controller_support: Optional[str] = Field(..., description="Type of controller support for the game, if available")
+    dlc: Optional[List[int]] = Field(
+        ..., description="List of downloadable content IDs associated with the game, if any"
+    )
+    detailed_description: str = Field(..., description="Detailed description of the game")
+    about_the_game: str = Field(..., description="Brief description about the game")
+    short_description: str = Field(..., description="Short description of the game")
+    supported_languages: str = Field(..., description="Languages supported by the game")
+    reviews: Optional[str] = Field(..., description="Reviews or critical acclaim summary of the game")
+    header_image: HttpUrl = Field(..., description="URL to the header image of the game")
+    capsule_image: HttpUrl = Field(..., description="URL to the capsule (thumbnail) image of the game")
+    website: Optional[HttpUrl] = Field(..., description="Official website of the game")
+    pc_requirements: PCRequirements = Field(..., description="PC system requirements for the game")
+    developers: Optional[List[str]] = Field(default=[], description="List of developers who worked on the game")
+    publishers: List[str] = Field(..., description="List of publishers responsible for distributing the game")
+    pc_platform: bool = Field(..., description="Indicates if the game is available on PC platforms")
+    metacritic: Optional[int] = Field(..., description="Metacritic score of the game, if available")
+    categories: Optional[list] = Field(default=[], description="Categories or genres of the game")
+    genres: Optional[list] = Field(default=[], description="Genres the game belongs to")
+    recommendations: int = Field(..., description="Number of recommendations from Steam users")
+    achievements: int = Field(..., description="Total number of attainable achievements")
+    release_date: Optional[datetime] = Field(..., description="Date when the game was released")
+    coming_soon: bool = Field(..., description="Indicates if the game release is upcoming")
+
+    @field_validator("release_date", mode="before")
+    def validate_release_date(cls, v):
+        if isinstance(v, str):
+            try:
+                parsed_date = parser.parse(v)
+                return parsed_date
+            except ValueError as e:
+                print(f"Error parsing date '{v}': {e}")
+                return None
+
+        if v is not None and not isinstance(v, str):
+            raise ValueError("date must be a string or an integer")
+
+        return v
+
+
+class GameList(BaseModel):
+    games: List[Game] = Field(..., description="The list of Steam games")
