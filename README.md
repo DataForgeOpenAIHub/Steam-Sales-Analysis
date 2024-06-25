@@ -1,7 +1,9 @@
 # Steam Sales Analysis
 
 ## Overview
-The Steam Sales Analysis project involves creating an ETL (Extract, Transform, Load) data pipeline that encompasses data retrieval, processing, validation, and ingestion operations. We call the Steamspy and Steam APIs to collect game-related metadata, details, and sales data. Finally, the data is loaded into a MySQL database hosted on Aiven Cloud.
+Welcome to **Steam Sales Analysis** – an innovative project designed to harness the power of data for insights into the gaming world. We have meticulously crafted an ETL (Extract, Transform, Load) pipeline that covers every essential step: data retrieval, processing, validation, and ingestion. By leveraging the robust Steamspy and Steam APIs, we collect comprehensive game-related metadata, details, and sales figures. 
+
+But we don’t stop there. The culmination of this data journey sees the information elegantly loaded into a MySQL database hosted on Aiven Cloud. From this solid foundation, we take it a step further: the data is analyzed and visualized through dynamic and interactive Tableau dashboards. This transforms raw numbers into actionable insights, offering a clear window into gaming trends and sales performance. Join us as we dive deep into the data and bring the world of gaming to life!
 
 ## Setup Instructions
 
