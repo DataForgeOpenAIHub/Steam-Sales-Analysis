@@ -24,7 +24,7 @@ def get_request(url: str, parameters=None, max_retries=4):
                 logger.warning(f"Rate limited. Waiting for {retry_after} seconds...")
                 time.sleep(retry_after)
             else:
-                logger.error(f"Error: Request failed with status code {response.status_code}")
+                logger.info(f"Error: Request failed with status code {response.status_code}")
                 return None
         except SSLError as e:
             logger.error(f"SSL Error: {e}")
@@ -36,7 +36,7 @@ def get_request(url: str, parameters=None, max_retries=4):
         time.sleep(wait_time)
         wait_time *= 4  # Exponential backoff
 
-    logger.info(f"Failed to retrieve data from {url}, params={parameters} after {max_retries} retries.")
+    logger.error(f"Failed to retrieve data from {url}, params={parameters} after {max_retries} retries.")
 
     return None
 
