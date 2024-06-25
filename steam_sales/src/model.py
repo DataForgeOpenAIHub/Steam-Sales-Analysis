@@ -1,5 +1,5 @@
 from db import Base, engine
-from sqlalchemy import Column, Float, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
 from sqlalchemy.dialects.mysql import JSON
 
 
@@ -35,6 +35,38 @@ class GameMeta(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     appid = Column(Integer, nullable=False)
     name = Column(String(255), nullable=False)
+
+
+class Game(Base):
+    __tablename__ = "steam_games_raw"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    type = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False)
+    appid = Column(Integer, nullable=False)
+    required_age = Column(Integer, nullable=True)
+    is_free = Column(Boolean, nullable=False)
+    controller_support = Column(String(255))
+    dlc = Column(JSON, nullable=True)
+    detailed_description = Column(Text, nullable=True)
+    about_the_game = Column(Text, nullable=True)
+    short_description = Column(Text, nullable=True)
+    supported_languages = Column(Text, nullable=False)
+    reviews = Column(Text, nullable=True)
+    header_image = Column(Text, nullable=False)
+    capsule_image = Column(Text, nullable=False)
+    website = Column(Text, default="")
+    pc_requirements = Column(JSON, nullable=False)
+    developers = Column(JSON, nullable=False)
+    publishers = Column(JSON, nullable=False)
+    pc_platform = Column(Boolean, nullable=False)
+    metacritic = Column(Integer, nullable=True)
+    categories = Column(JSON, nullable=False)
+    genres = Column(JSON, nullable=False)
+    recommendations = Column(Integer, nullable=True)
+    achievements = Column(Integer, nullable=False)
+    release_date = Column(DateTime, nullable=True)
+    coming_soon = Column(Boolean, nullable=True)
 
 
 Base.metadata.create_all(engine)
