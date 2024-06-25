@@ -12,14 +12,17 @@ logger = get_logger(__file__)
 
 def get_request(url: str, parameters=None, max_retries=5):
     try_count = 0
+    wait_time = 1  # Initial wait time in seconds
+
     while try_count < max_retries:
         try:
             response = requests.get(url=url, params=parameters)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 429:
-                logger.warning(f"Rate limited. Waiting for {response.headers['Retry-After']} seconds...")
-                time.sleep(int(response.headers["Retry-After"]) + 1)
+                retry_after = int(response.headers.get("Retry-After", wait_time))
+                logger.warning(f"Rate limited. Waiting for {retry_after} seconds...")
+                time.sleep(retry_after)
             else:
                 logger.error(f"Error: Request failed with status code {response.status_code}")
                 return None
@@ -29,10 +32,12 @@ def get_request(url: str, parameters=None, max_retries=5):
             logger.exception(f"Request Exception: {e}")
 
         try_count += 1
-        logger.info(f"Retrying ({try_count}/{max_retries})...")
-        time.sleep(5)
+        logger.info(f"Retrying ({try_count}/{max_retries}) in {wait_time} seconds...")
+        time.sleep(wait_time)
+        wait_time *= 4  # Exponential backoff
 
-    logger.info(f"Failed to retrieve data from {url} after {max_retries} retries.")
+    logger.info(f"Failed to retrieve data from {url}, params={parameters} after {max_retries} retries.")
+
     return None
 
 
