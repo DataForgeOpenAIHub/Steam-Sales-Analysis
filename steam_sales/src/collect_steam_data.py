@@ -62,9 +62,6 @@ def text_parser(text: str):
 
 def parse_game_data(data: dict):
     try:
-        if "English" not in data["supported_languages"]:
-            return None
-
         game_data = {
             "appid": data["steam_appid"],
             "name": data["name"],
