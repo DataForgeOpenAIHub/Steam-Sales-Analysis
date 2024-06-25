@@ -1,6 +1,6 @@
 import logging
+import logging.handlers
 import os
-from pprint import pprint
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -12,13 +12,20 @@ class Path:
     package_dir = os.path.dirname(curr_file_dir)
     root_dir = os.path.dirname(package_dir)
 
-    env_file = os.path.join(root_dir, ".env")
+    env_file = os.path.join(root_dir, ".envx")
     data_dir = os.path.join(root_dir, "data")
     sql_queries = os.path.join(package_dir, "sql")
+    log_file = os.path.join(root_dir, "logs")
+
+    if not os.path.exists(log_file):
+        os.mkdir(log_file)
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=Path.env_file, extra="ignore", env_file_encoding="utf-8")
+    if os.path.exists(Path.env_file):
+        model_config = SettingsConfigDict(env_file=Path.env_file, extra="ignore", env_file_encoding="utf-8")
+    else:
+        model_config = SettingsConfigDict(extra="ignore")
 
     # Database configuration
     MYSQL_USERNAME: str = Field()
@@ -46,8 +53,19 @@ def get_logger(name):
     formatter = logging.Formatter("%(message)s")
     ch.setFormatter(formatter)
 
+    # Create a file handler and set the level
+    fh = logging.handlers.RotatingFileHandler(
+        os.path.join(Path.log_file, "steam-data.log"), maxBytes=5 * 1024 * 1024, backupCount=3
+    )
+    fh.setLevel(logging.ERROR)
+
+    # Create a formatter and add it to both handlers
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    fh.setFormatter(formatter)
+
     # Add the handler to the logger
     logger.addHandler(ch)
+    logger.addHandler(fh)
     return logger
 
 
@@ -57,5 +75,5 @@ def get_settings():
 
 config = get_settings()
 
-# pprint(Path.__dict__)
-# pprint(config.model_dump())
+# print(Path.__dict__)
+# print(config.model_dump())
