@@ -1,9 +1,7 @@
-from typing import List
-
 import model
 from settings import get_logger
 from sqlalchemy.orm import Session
-from validation import GameDetailsList, GameMetaDataList
+from validation import GameDetailsList, GameList, GameMetaDataList
 
 logger = get_logger(__file__)
 
@@ -39,11 +37,25 @@ def bulk_ingest_meta_data(requests: GameMetaDataList, db: Session):
     return new_docs
 
 
-def bulk_ingest_data(requests: GameDetailsList, db: Session):
+def bulk_ingest_steamspy_data(requests: GameDetailsList, db: Session):
     new_docs = []
 
     for np in requests.games:
         new_post = model.GameDetails(**np.model_dump())
+        new_docs.append(new_post)
+
+    db.bulk_save_objects(new_docs)
+    db.commit()
+
+    logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
+    return new_docs
+
+
+def bulk_ingest_steam_data(requests: GameList, db: Session):
+    new_docs = []
+
+    for np in requests.games:
+        new_post = model.Game(**np.model_dump())
         new_docs.append(new_post)
 
     db.bulk_save_objects(new_docs)
