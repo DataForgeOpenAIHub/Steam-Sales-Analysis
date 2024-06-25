@@ -51,7 +51,7 @@ class Game(Base):
     detailed_description = Column(Text, nullable=True)
     about_the_game = Column(Text, nullable=True)
     short_description = Column(Text, nullable=True)
-    supported_languages = Column(Text, nullable=False)
+    supported_languages = Column(Text, nullable=True)
     reviews = Column(Text, nullable=True)
     header_image = Column(Text, nullable=False)
     capsule_image = Column(Text, nullable=False)
