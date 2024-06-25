@@ -1,4 +1,7 @@
+import datetime as dt
 import os
+import statistics
+import time
 from multiprocessing import Pool, cpu_count
 
 from bs4 import BeautifulSoup
@@ -124,13 +127,26 @@ def main():
     num_batches = (len(app_id_list) + batch_size - 1) // batch_size
     current_batch = 0
 
+    batch_times = []
+
     for i in range(0, len(app_id_list), batch_size):
+        start_time = time.time()
+
         current_batch += 1
         batch = app_id_list[i : i + batch_size]
         app_data = fetch_and_process_app_data(batch)
 
         bulk_ingest_steam_data(app_data, db)
-        logger.info(f"Batch {current_batch} of {num_batches} completed")
+
+        end_time = time.time()
+        time_taken = end_time - start_time
+        batch_times.append(time_taken)
+        mean_time = statistics.mean(batch_times)
+        est_remaining = (num_batches - i - 2) * mean_time
+        remaining_td = dt.timedelta(seconds=round(est_remaining))
+        time_td = dt.timedelta(seconds=round(time_taken))
+
+        logger.info(f"Batch {current_batch} of {num_batches} completed. Time taken: {time_td} -> ETA: {remaining_td}")
 
 
 if __name__ == "__main__":
