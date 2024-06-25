@@ -20,9 +20,9 @@ def parse_steam_request(appid: int):
     if json_data:
         json_app_data = json_data[str(appid)]
 
-    if json_app_data["success"]:
-        data = json_app_data["data"]
-        return data
+        if json_app_data["success"]:
+            data = json_app_data["data"]
+            return data
 
     return None
 
@@ -91,7 +91,7 @@ def parse_game_data(data: dict):
             "release_date": data["release_date"]["date"],
             "coming_soon": data["release_date"]["coming_soon"],
         }
-        # logger.info(game_data)
+
         return Game(**game_data)
     except KeyError as ke:
         logger.error(f"KeyError parsing game data for `{data['steam_appid']}`: Missing key {ke}")
