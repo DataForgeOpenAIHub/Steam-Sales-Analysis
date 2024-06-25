@@ -10,7 +10,7 @@ from validation import GameMetaDataList
 logger = get_logger(__file__)
 
 
-def get_request(url: str, parameters=None, max_retries=5):
+def get_request(url: str, parameters=None, max_retries=4):
     try_count = 0
     wait_time = 1  # Initial wait time in seconds
 
