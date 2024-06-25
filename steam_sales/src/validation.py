@@ -1,5 +1,6 @@
+import re
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from dateutil import parser
 from pydantic import BaseModel, Field, HttpUrl, field_validator
@@ -73,7 +74,7 @@ class Game(BaseModel):
     type: str = Field(..., description="Type of the game")
     name: str = Field(..., description="Name of the game")
     appid: int = Field(..., description="Application ID of the game")
-    required_age: Optional[int | str] = Field(..., description="Minimum required age to play the game.")
+    required_age: Optional[Union[int, str]] = Field(..., description="Minimum required age to play the game.")
     is_free: bool = Field(..., description="Indicates if the game is free to play")
     controller_support: Optional[str] = Field(..., description="Type of controller support for the game, if available")
     dlc: Optional[List[int]] = Field(
@@ -111,6 +112,19 @@ class Game(BaseModel):
 
         if v is not None and not isinstance(v, str):
             raise ValueError("date must be a string or an integer")
+
+        return v
+
+    @field_validator("required_age", mode="before")
+    def validate_required_age(cls, v):
+        if isinstance(v, str):
+            match = re.search(r"\d+", v)
+            if match:
+                v = int(match.group())
+            else:
+                raise ValueError(f"Invalid value for required_age: {v}")
+        elif not isinstance(v, int):
+            raise ValueError(f"Invalid value type for required_age: {type(v)}")
 
         return v
 
