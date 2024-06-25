@@ -12,7 +12,7 @@ class Path:
     package_dir = os.path.dirname(curr_file_dir)
     root_dir = os.path.dirname(package_dir)
 
-    env_file = os.path.join(root_dir, ".envx")
+    env_file = os.path.join(root_dir, ".env")
     data_dir = os.path.join(root_dir, "data")
     sql_queries = os.path.join(package_dir, "sql")
     log_file = os.path.join(root_dir, "logs")
