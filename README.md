@@ -57,3 +57,19 @@ To execute the ETL pipeline, use the following command:
     ```
 
 This will start the process of retrieving data from the Steamspy and Steam APIs, processing and validating it, and then loading it into the MySQL database.
+
+## References:
+### API Used:
+- [Steamspy API](https://steamspy.com/api.php)
+- [Steam Store API - InternalSteamWebAPI](https://github.com/Revadike/InternalSteamWebAPI/wiki)
+
+---
+
+#### LICENSE
+This repository is licensed under the `MIT License` License. See the [LICENSE](LICENSE) file for details.
+
+#### Disclaimer
+
+<sub>
+The content and code provided in this repository are for educational and demonstrative purposes only. The project may contain experimental features, and the code might not be optimized for production environments. The authors and contributors are not liable for any misuse, damages, or risks associated with the direct or indirect use of this code. Users are strictly advised to review, test, and completely modify the code to suit their specific use cases and requirements. By using any part of this project, you agree to these terms.
+</sub>
