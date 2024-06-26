@@ -6,8 +6,7 @@ from sqlalchemy.dialects.mysql import JSON
 class GameDetails(Base):
     __tablename__ = "steamspy_games_raw"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    appid = Column(Integer, unique=True, nullable=False)
+    appid = Column(Integer, primary_key=True, nullable=False)
     name = Column(String(255), nullable=False)
     developer = Column(String(255), nullable=False)
     publisher = Column(String(255), nullable=False)
@@ -32,18 +31,16 @@ class GameDetails(Base):
 class GameMeta(Base):
     __tablename__ = "steamspy_games_metadata"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    appid = Column(Integer, nullable=False)
+    appid = Column(Integer, primary_key=True, nullable=False)
     name = Column(String(255), nullable=False)
 
 
 class Game(Base):
     __tablename__ = "steam_games_raw"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
     type = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
-    appid = Column(Integer, nullable=False)
+    appid = Column(Integer, primary_key=True, nullable=False)
     required_age = Column(Integer, nullable=True)
     is_free = Column(Boolean, nullable=False)
     controller_support = Column(String(255))

@@ -6,8 +6,8 @@ from crud import bulk_ingest_steamspy_data
 from db import get_db
 from settings import Path, config, get_logger
 from sqlalchemy import text
+from tqdm import tqdm
 from validation import GameDetails, GameDetailsList
-
 
 logger = get_logger(__file__)
 
@@ -58,16 +58,14 @@ def main():
     logger.info(f"{len(app_id_list)} ID's found")
 
     batch_size = 1000
-    num_batches = (len(app_id_list) + batch_size - 1) // batch_size
     current_batch = 0
 
-    for i in range(0, len(app_id_list), batch_size):
+    for i in tqdm(range(0, len(app_id_list), batch_size)):
         current_batch += 1
         batch = app_id_list[i : i + batch_size]
         app_data = fetch_and_process_app_data(batch)
 
         bulk_ingest_steamspy_data(app_data, db)
-        logger.info(f"Batch {current_batch} of {num_batches} completed")
 
 
 if __name__ == "__main__":

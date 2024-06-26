@@ -120,7 +120,7 @@ def game_exists(appid: str, db: Session):
     blog = db.query(model.Game).filter(model.Game.appid == appid).first()
     if blog:
         logger.warning(
-            f"Document with the id '{appid}' already exists. Skipping the requesting the data from the Steam API.",
+            f"Document with the id '{appid}' already exists. Requesting the data from the Steam API skipped.",
         )
         return True
     return False

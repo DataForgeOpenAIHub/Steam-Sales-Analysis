@@ -106,6 +106,7 @@ class Game(BaseModel):
             try:
                 parsed_date = parser.parse(v)
                 return parsed_date
+
             except ValueError as e:
                 print(f"Error parsing date '{v}': {e}")
                 return None
@@ -123,6 +124,7 @@ class Game(BaseModel):
                 v = int(match.group())
             else:
                 raise ValueError(f"Invalid value for required_age: {v}")
+
         elif not isinstance(v, int):
             raise ValueError(f"Invalid value type for required_age: {type(v)}")
 

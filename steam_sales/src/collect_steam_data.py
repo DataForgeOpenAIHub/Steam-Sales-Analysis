@@ -1,10 +1,8 @@
-import datetime as dt
 import os
-import statistics
-import time
 from multiprocessing import Pool, cpu_count
 
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 from collect_metadata import get_request
 from crud import bulk_ingest_steam_data, game_exists
 from db import get_db
@@ -25,10 +23,6 @@ def parse_steam_request(appid: int):
     Returns:
         dict: The data retrieved from the Steam request, or None if the request fails.
     """
-    db = get_db()
-    if game_exists(appid, db):
-        return None
-
     url = f"{config.STEAM_BASE_SEARCH_URL}/api/appdetails/"
     parameters = {"appids": appid}
 
@@ -155,7 +149,26 @@ def parse_game_data(data: dict):
     return None
 
 
-def fetch_and_process_app_data(app_id_list):
+def remove_dups(batch, db):
+    """
+    Remove duplicate app IDs from the given batch.
+
+    Parameters:
+    - batch (list): A list of app IDs.
+    - db (Database): An instance of the database.
+
+    Returns:
+    - list: The updated batch with duplicate app IDs removed.
+    """
+    logger.info(batch)
+    for appid in batch:
+        if game_exists(appid, db):
+            batch.remove(appid)
+    logger.info(batch)
+    return batch
+
+
+def fetch_and_process_app_data(batch_list, db):
     """
     Fetches and processes app data for a given list of app IDs.
 
@@ -166,13 +179,16 @@ def fetch_and_process_app_data(app_id_list):
         GameList: A GameList object containing the processed app data.
     """
     app_data = []
-    with Pool(processes=cpu_count()) as pool:
-        results = pool.map(parse_steam_request, app_id_list)
-        app_data.extend(filter(None, results))
+    # batch_list = remove_dups(batch_list, db)
+    if batch_list:
+        with Pool(processes=cpu_count()) as pool:
+            results = pool.map(parse_steam_request, batch_list)
+            app_data.extend(filter(None, results))
 
-    final_app_data = [game for game in (parse_game_data(data) for data in app_data) if game is not None]
+        final_app_data = [game for game in (parse_game_data(data) for data in app_data) if game is not None]
 
-    return GameList(games=final_app_data)
+        return GameList(games=final_app_data)
+    return None
 
 
 def main():
@@ -185,29 +201,15 @@ def main():
     logger.info(f"{len(app_id_list)} ID's found")
 
     batch_size = 5
-    num_batches = (len(app_id_list) + batch_size - 1) // batch_size
     current_batch = 0
 
-    batch_times = []
-
-    for i in range(0, len(app_id_list), batch_size):
-        start_time = time.time()
-
+    for i in tqdm(range(0, len(app_id_list), batch_size)):
         current_batch += 1
         batch = app_id_list[i : i + batch_size]
-        app_data = fetch_and_process_app_data(batch)
+        app_data = fetch_and_process_app_data(batch, db)
 
-        bulk_ingest_steam_data(app_data, db)
-
-        end_time = time.time()
-        time_taken = end_time - start_time
-        batch_times.append(time_taken)
-        mean_time = statistics.mean(batch_times)
-        est_remaining = (num_batches - i - 2) * mean_time
-        remaining_td = dt.timedelta(seconds=round(est_remaining))
-        time_td = dt.timedelta(seconds=round(time_taken))
-
-        logger.info(f"Batch {current_batch} of {num_batches} completed. Time taken: {time_td} -> ETA: {remaining_td}")
+        if app_data:
+            bulk_ingest_steam_data(app_data, db)
 
 
 if __name__ == "__main__":
