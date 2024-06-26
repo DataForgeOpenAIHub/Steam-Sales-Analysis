@@ -11,8 +11,20 @@ logger = get_logger(__file__)
 
 
 def get_request(url: str, parameters=None, max_retries=4):
+    """
+    Sends a GET request to the specified URL with optional parameters.
+
+    Args:
+        url (str): The URL to send the request to.
+        parameters (dict, optional): The parameters to include in the request. Defaults to None.
+        max_retries (int, optional): The maximum number of retries in case of failures. Defaults to 4.
+
+    Returns:
+        dict or None: The JSON response if the request is successful, None otherwise.
+    """
+
     try_count = 0
-    wait_time = 1  # Initial wait time in seconds
+    wait_time = 1
 
     while try_count < max_retries:
         try:
@@ -34,7 +46,7 @@ def get_request(url: str, parameters=None, max_retries=4):
         try_count += 1
         logger.info(f"Retrying ({try_count}/{max_retries}) in {wait_time} seconds...")
         time.sleep(wait_time)
-        wait_time *= 4  # Exponential backoff
+        wait_time *= 4
 
     logger.error(f"Failed to retrieve data from {url}, params={parameters} after {max_retries} retries.")
 
