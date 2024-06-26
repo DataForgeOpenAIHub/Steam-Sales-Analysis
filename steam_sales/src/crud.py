@@ -65,11 +65,11 @@ def bulk_ingest_steam_data(requests: GameList, db: Session):
     return new_docs
 
 
-# def document_exists(appid: str, db: Session):
-#     blog = db.query(model.GameMeta).filter(model.GameMeta.appid == appid).first()
-#     if blog:
-#         logger.error(
-#             f"Document with the id '{appid}' already exists",
-#         )
-#         return True
-#     return False
+def game_exists(appid: str, db: Session):
+    blog = db.query(model.Game).filter(model.Game.appid == appid).first()
+    if blog:
+        logger.warning(
+            f"Document with the id '{appid}' already exists. Skipping the requesting the data from the Steam API.",
+        )
+        return True
+    return False
