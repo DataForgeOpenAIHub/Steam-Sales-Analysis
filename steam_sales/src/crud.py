@@ -7,6 +7,17 @@ logger = get_logger(__file__)
 
 
 def remove_duplicates_meta(all_data: GameMetaDataList, unique_games: list = []) -> GameMetaDataList:
+    """
+    Removes duplicates from the given list of game metadata.
+
+    Args:
+        all_data (GameMetaDataList): The list of game metadata to remove duplicates from.
+        unique_games (list, optional): A list of unique game appids. Defaults to an empty list.
+
+    Returns:
+        GameMetaDataList: A new list of game metadata without duplicates.
+    """
+
     seen_appids = set(unique_games)
     unique_games = []
 
@@ -19,6 +30,16 @@ def remove_duplicates_meta(all_data: GameMetaDataList, unique_games: list = []) 
 
 
 def bulk_ingest_meta_data(requests: GameMetaDataList, db: Session):
+    """
+    Bulk ingests game metadata into the database.
+
+    Args:
+        requests (GameMetaDataList): A list of game metadata requests.
+        db (Session): The database session.
+
+    Returns:
+        List[GameMeta]: A list of newly added game metadata documents.
+    """
     new_docs = []
 
     games_in_db = db.query(model.GameMeta.appid).all()
@@ -38,6 +59,16 @@ def bulk_ingest_meta_data(requests: GameMetaDataList, db: Session):
 
 
 def bulk_ingest_steamspy_data(requests: GameDetailsList, db: Session):
+    """
+    Bulk ingests SteamSpy data into the database.
+
+    Args:
+        requests (GameDetailsList): A list of game details to be ingested.
+        db (Session): The database session.
+
+    Returns:
+        List[GameDetails]: The list of newly added game details documents.
+    """
     new_docs = []
 
     for np in requests.games:
@@ -52,6 +83,16 @@ def bulk_ingest_steamspy_data(requests: GameDetailsList, db: Session):
 
 
 def bulk_ingest_steam_data(requests: GameList, db: Session):
+    """
+    Bulk ingests Steam data into the database.
+
+    Args:
+        requests (GameList): A list of game requests.
+        db (Session): The database session.
+
+    Returns:
+        List[Game]: A list of newly added game documents.
+    """
     new_docs = []
 
     for np in requests.games:
@@ -66,6 +107,16 @@ def bulk_ingest_steam_data(requests: GameList, db: Session):
 
 
 def game_exists(appid: str, db: Session):
+    """
+    Check if a game with the given appid exists in the database.
+
+    Args:
+        appid (str): The appid of the game to check.
+        db (Session): The database session.
+
+    Returns:
+        bool: True if the game exists in the database, False otherwise.
+    """
     blog = db.query(model.Game).filter(model.Game.appid == appid).first()
     if blog:
         logger.warning(
