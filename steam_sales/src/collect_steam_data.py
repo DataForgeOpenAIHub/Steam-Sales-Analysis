@@ -16,6 +16,15 @@ logger = get_logger(__name__)
 
 
 def parse_steam_request(appid: int):
+    """
+    Parse the Steam request for a given appid.
+
+    Args:
+        appid (int): The ID of the Steam application.
+
+    Returns:
+        dict: The data retrieved from the Steam request, or None if the request fails.
+    """
     if game_exists(appid):
         return None
 
@@ -34,6 +43,16 @@ def parse_steam_request(appid: int):
 
 
 def parse_html_to_dict(html_content: str):
+    """
+    Parses the HTML content and converts it into a dictionary.
+
+    Args:
+        html_content (str): The HTML content to be parsed.
+
+    Returns:
+        dict: A dictionary containing the parsed data, where each key represents a line of text and its corresponding
+        value.
+    """
     soup = BeautifulSoup(html_content, "lxml")
     plain_text = soup.get_text(separator="\n", strip=True)
     lines = plain_text.split("\n")
@@ -67,6 +86,15 @@ def text_parser(text: str):
 
 
 def parse_game_data(data: dict):
+    """
+    Parses the Steam game data and returns a Game object.
+
+    Args:
+        data (dict): The Steam game data to be parsed.
+
+    Returns:
+        Game: A Game object containing the parsed data, or None if the data is invalid.
+    """
     try:
         game_data = {
             "appid": data["steam_appid"],
@@ -107,6 +135,15 @@ def parse_game_data(data: dict):
 
 
 def fetch_and_process_app_data(app_id_list):
+    """
+    Fetches and processes app data for a given list of app IDs.
+
+    Args:
+        app_id_list (list): A list of app IDs to fetch data for.
+
+    Returns:
+        GameList: A GameList object containing the processed app data.
+    """
     app_data = []
     with Pool(processes=cpu_count()) as pool:
         results = pool.map(parse_steam_request, app_id_list)
