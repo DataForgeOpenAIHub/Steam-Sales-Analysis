@@ -66,6 +66,16 @@ def parse_html_to_dict(html_content: str):
 
 
 def requirements_parser(requirements: dict):
+    """
+    Parses the requirements dictionary and returns a dictionary with minimum and recommended requirements.
+
+    Args:
+        requirements (dict): A dictionary containing the minimum and recommended requirements.
+
+    Returns:
+        dict: A dictionary with minimum and recommended requirements parsed from the input dictionary.
+    """
+
     requirements_dict = {"minimum": None, "recommended": None}
 
     if "minimum" in requirements:
@@ -78,6 +88,16 @@ def requirements_parser(requirements: dict):
 
 
 def text_parser(text: str):
+    """
+    Parses the given HTML text using BeautifulSoup and returns the plain text.
+
+    Args:
+        text (str): The HTML text to be parsed.
+
+    Returns:
+        str: The plain text extracted from the HTML.
+
+    """
     if text:
         soup = BeautifulSoup(text, "lxml")
         plain_text = soup.get_text(separator="\n", strip=True)
