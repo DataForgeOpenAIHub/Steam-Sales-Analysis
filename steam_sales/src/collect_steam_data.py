@@ -6,7 +6,7 @@ from multiprocessing import Pool, cpu_count
 
 from bs4 import BeautifulSoup
 from collect_metadata import get_request
-from crud import bulk_ingest_steam_data
+from crud import bulk_ingest_steam_data, game_exists
 from db import get_db
 from settings import Path, config, get_logger
 from sqlalchemy import text
@@ -16,6 +16,9 @@ logger = get_logger(__name__)
 
 
 def parse_steam_request(appid: int):
+    if game_exists(appid):
+        return None
+
     url = f"{config.STEAM_BASE_SEARCH_URL}/api/appdetails/"
     parameters = {"appids": appid}
 
