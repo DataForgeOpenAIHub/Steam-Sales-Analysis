@@ -31,13 +31,14 @@ def parse_steam_request(appid: int):
 
     json_data = get_request(url, parameters=parameters)
 
-    resp = json_data[str(appid)]
-    if resp["success"]:
-        data = resp["data"]
-        data = parse_game_data(data)
+    if json_data:
+        resp = json_data[str(appid)]
+        if resp["success"]:
+            data = resp["data"]
+            data = parse_game_data(data)
 
-        if data and appid == data.appid:
-            return data
+            if data and appid == data.appid:
+                return data
 
     logger.error(f"Could not find data for appid {appid} in Steam Store Database")
     return None
