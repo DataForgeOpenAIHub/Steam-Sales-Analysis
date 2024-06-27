@@ -46,7 +46,7 @@ class Game(Base):
     controller_support = Column(String(255))
     dlc = Column(JSON, nullable=True)
     detailed_description = Column(LONGTEXT, nullable=True)
-    about_the_game = Column(Text, nullable=True)
+    about_the_game = Column(LONGTEXT, nullable=True)
     short_description = Column(Text, nullable=True)
     supported_languages = Column(Text, nullable=True)
     reviews = Column(Text, nullable=True)
