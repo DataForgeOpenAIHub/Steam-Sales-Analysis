@@ -2,6 +2,7 @@ import os
 import warnings
 from multiprocessing import Pool, cpu_count
 
+import typer
 from bs4 import BeautifulSoup
 from collect_metadata import get_request
 from crud import bulk_ingest_steam_data
@@ -14,6 +15,7 @@ from validation import Game, GameList
 warnings.filterwarnings("ignore")
 
 logger = get_logger(__file__)
+app = typer.Typer()
 
 
 def parse_steam_request(appid: int):
@@ -174,29 +176,51 @@ def fetch_and_process_app_data(batch_list):
     return None
 
 
-def main():
+@app.command(name="fetch_ingest_data", help="Fetch and ingest data from Steam Store Database")
+def main(
+    batch_size: int = typer.Option(5, help="Number of app IDs to process in each batch."),
+    bulk_factor: int = typer.Option(
+        10, help="Factor to determine when to perform a bulk insert (batch_size * bulk_factor)."
+    ),
+    reverse: bool = typer.Option(False, help="Process app IDs in reverse order."),
+):
+    """
+    This command fetches unique app IDs from the Steam Store Database, processes the data in batches,
+    and ingests the data into the database. The process is designed to handle large datasets efficiently
+    by using batch processing and bulk insertion methods.
+
+    Parameters:
+    - batch_size (int): The number of app IDs to process in each batch. Default is 5.
+    - bulk_factor (int): Determines when to perform a bulk insert. Data is ingested in bulk when the
+      number of processed games reaches batch_size * bulk_factor. Default is 10.
+    - reverse (bool): If set to True, the app IDs are processed in reverse order. Default is False.
+    """
+    # Create a database session
     db = get_db()
+
+    # Query unique appids from the database
     with open(os.path.join(Path.sql_queries, "steam_appid_dup.sql"), "r") as f:
         query = text(f.read())
 
     result = db.execute(query)
     app_id_list = [row[0] for row in result.fetchall()]
+
+    if reverse:
+        app_id_list.reverse()
+
     logger.info(f"{len(app_id_list)} ID's found")
 
-    batch_size = 5
-    current_batch = 0
-
+    # Get the list of games batch them and insert into db
     games = GameList(games=[])
 
     for i in tqdm(range(0, len(app_id_list), batch_size)):
-        current_batch += 1
         batch = app_id_list[i : i + batch_size]
         app_data = fetch_and_process_app_data(batch)
 
         if app_data:
             games.games.extend(app_data)
 
-        if games.get_num_games() >= batch_size * 10:
+        if games.get_num_games() >= batch_size * bulk_factor:
             bulk_ingest_steam_data(games, db)
             games.games = []
 
