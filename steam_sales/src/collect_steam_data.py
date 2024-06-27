@@ -10,12 +10,13 @@ from db import get_db
 from settings import Path, config, get_logger
 from sqlalchemy import text
 from tqdm import tqdm
+from typing_extensions import Annotated
 from validation import Game, GameList
 
 warnings.filterwarnings("ignore")
 
 logger = get_logger(__file__)
-app = typer.Typer()
+app = typer.Typer(name="Steam Data Collector", pretty_exceptions_enable=False)
 
 
 def parse_steam_request(appid: int):
@@ -178,11 +179,11 @@ def fetch_and_process_app_data(batch_list):
 
 @app.command(name="fetch_ingest_data", help="Fetch and ingest data from Steam Store Database")
 def main(
-    batch_size: int = typer.Option(5, help="Number of app IDs to process in each batch."),
-    bulk_factor: int = typer.Option(
-        10, help="Factor to determine when to perform a bulk insert (batch_size * bulk_factor)."
-    ),
-    reverse: bool = typer.Option(False, help="Process app IDs in reverse order."),
+    batch_size: Annotated[int, typer.Option(help="Number of app IDs to process in each batch.")] = 5,
+    bulk_factor: Annotated[
+        int, typer.Option(help="Factor to determine when to perform a bulk insert (batch_size * bulk_factor).")
+    ] = 10,
+    reverse: Annotated[bool, typer.Option(help="Process app IDs in reverse order.")] = False,
 ):
     """
     This command fetches unique app IDs from the Steam Store Database, processes the data in batches,
@@ -226,4 +227,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main()
+    app()
