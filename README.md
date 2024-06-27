@@ -48,9 +48,22 @@ To execute the ETL pipeline, use the following command:
     python steam_sales/src/collect_metadata.py
     ```
 2. To collect steamspy data
-    ```bash
-    python steam_sales/src/collect_steamspy_data.py
-    ```
+   ```bash
+   python steam_sales/src/collect_steam_data.py --help 
+   
+   Usage: collect_steam_data.py [OPTIONS]
+
+   Fetch and ingest data from Steam Store Database
+
+   ╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+   │ --batch-size                            INTEGER  Number of app IDs to process in each batch.[default:5]                                        │
+   │ --bulk-factor                           INTEGER  Factor to determine when to perform a bulk insert (batch_size * bulk_factor). [default: 10]   │
+   │ --reverse               --no-reverse             Process app IDs in reverse order. [default: no-reverse]                                       │
+   │ --install-completion                             Install completion for the current shell.                                                     │
+   │ --show-completion                                Show completion for the current shell, to copy it or customize the installation.              │
+   │ --help                                           Show this message and exit.                                                                   │
+   ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+   ```
 3. To collect steam metadata
     ```bash
     python steam_sales/src/collect_steam_data.py
