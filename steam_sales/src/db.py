@@ -30,6 +30,8 @@ Base = declarative_base()
 def get_db():
     db = SessionLocal()
     try:
+        db.autoflush = True
+        db.expire_on_commit = True
         return db
     finally:
         db.close()
