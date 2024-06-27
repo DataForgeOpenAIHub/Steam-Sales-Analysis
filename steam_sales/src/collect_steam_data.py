@@ -16,7 +16,7 @@ from validation import Game, GameList
 warnings.filterwarnings("ignore")
 
 logger = get_logger(__file__)
-app = typer.Typer(name="Steam Data Collector", pretty_exceptions_enable=False)
+app = typer.Typer(name="Steam Data Collector")
 
 
 def parse_steam_request(appid: int):
