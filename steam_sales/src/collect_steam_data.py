@@ -30,16 +30,16 @@ def parse_steam_request(appid: int):
     parameters = {"appids": appid}
 
     json_data = get_request(url, parameters=parameters)
-    if json_data:
-        json_app_data = json_data[str(appid)]
 
-        if json_app_data["success"]:
-            data = json_app_data["data"]
-            data = parse_game_data(data)
+    resp = json_data[str(appid)]
+    if resp["success"]:
+        data = resp["data"]
+        data = parse_game_data(data)
 
-            if data and appid == data.appid:
-                return data
+        if data and appid == data.appid:
+            return data
 
+    logger.error(f"Could not find data for appid {appid} in Steam Store Database")
     return None
 
 
@@ -149,8 +149,6 @@ def parse_game_data(data: dict):
         return Game(**game_data)
     except KeyError as ke:
         logger.error(f"KeyError parsing game data for `{data['steam_appid']}`: Missing key {ke}")
-    except Exception as e:
-        logger.error(f"Error parsing game data for `{data.get('steam_appid', 'unknown')}`: {str(e)}")
 
     return None
 
