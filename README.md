@@ -62,7 +62,12 @@ This will start the process of retrieving data from the Steamspy and Steam APIs,
 ### API Used:
 - [Steamspy API](https://steamspy.com/api.php)
 - [Steam Store API - InternalSteamWebAPI](https://github.com/Revadike/InternalSteamWebAPI/wiki)
+- [Steam Web API Documentation](https://steamapi.xpaw.me/#)
+- [RJackson/StorefrontAPI Documentation](https://wiki.teamfortress.com/wiki/User:RJackson/StorefrontAPI)
+- [Steamworks Web API Reference](https://partner.steamgames.com/doc/webapi)
 
+### Repository
+- [Nik Davis's Steam Data Science Project](https://github.com/nik-davis/steam-data-science-project)
 ---
 
 #### LICENSE
