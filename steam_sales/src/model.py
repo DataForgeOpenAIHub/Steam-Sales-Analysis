@@ -47,7 +47,7 @@ class Game(Base):
     dlc = Column(JSON, nullable=True)
     detailed_description = Column(LONGTEXT, nullable=True)
     about_the_game = Column(LONGTEXT, nullable=True)
-    short_description = Column(Text, nullable=True)
+    short_description = Column(LONGTEXT, nullable=True)
     supported_languages = Column(Text, nullable=True)
     reviews = Column(Text, nullable=True)
     header_image = Column(Text, nullable=False)
