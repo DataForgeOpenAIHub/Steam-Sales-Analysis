@@ -1,6 +1,6 @@
 from db import Base, engine
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
-from sqlalchemy.dialects.mysql import JSON
+from sqlalchemy.dialects.mysql import JSON, LONGTEXT
 
 
 class GameDetails(Base):
@@ -45,7 +45,7 @@ class Game(Base):
     is_free = Column(Boolean, nullable=False)
     controller_support = Column(String(255))
     dlc = Column(JSON, nullable=True)
-    detailed_description = Column(Text, nullable=True)
+    detailed_description = Column(LONGTEXT, nullable=True)
     about_the_game = Column(Text, nullable=True)
     short_description = Column(Text, nullable=True)
     supported_languages = Column(Text, nullable=True)
