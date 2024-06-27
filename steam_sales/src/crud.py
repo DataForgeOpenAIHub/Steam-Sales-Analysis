@@ -96,6 +96,9 @@ def bulk_ingest_steam_data(requests: GameList, db: Session):
     new_docs = []
 
     for np in requests.games:
+        if game_exists(np.appid, db):
+            continue
+
         new_post = model.Game(**np.model_dump())
         new_docs.append(new_post)
 
