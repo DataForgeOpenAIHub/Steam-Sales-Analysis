@@ -1,16 +1,19 @@
 import os
+import warnings
 from multiprocessing import Pool, cpu_count
 
 from bs4 import BeautifulSoup
-from tqdm import tqdm
 from collect_metadata import get_request
-from crud import bulk_ingest_steam_data, game_exists
+from crud import bulk_ingest_steam_data
 from db import get_db
 from settings import Path, config, get_logger
 from sqlalchemy import text
+from tqdm import tqdm
 from validation import Game, GameList
 
-logger = get_logger(__name__)
+warnings.filterwarnings("ignore")
+
+logger = get_logger(__file__)
 
 
 def parse_steam_request(appid: int):
@@ -32,7 +35,10 @@ def parse_steam_request(appid: int):
 
         if json_app_data["success"]:
             data = json_app_data["data"]
-            return data
+            data = parse_game_data(data)
+
+            if data and appid == data.appid:
+                return data
 
     return None
 
@@ -149,26 +155,7 @@ def parse_game_data(data: dict):
     return None
 
 
-def remove_dups(batch, db):
-    """
-    Remove duplicate app IDs from the given batch.
-
-    Parameters:
-    - batch (list): A list of app IDs.
-    - db (Database): An instance of the database.
-
-    Returns:
-    - list: The updated batch with duplicate app IDs removed.
-    """
-    logger.info(batch)
-    for appid in batch:
-        if game_exists(appid, db):
-            batch.remove(appid)
-    logger.info(batch)
-    return batch
-
-
-def fetch_and_process_app_data(batch_list, db):
+def fetch_and_process_app_data(batch_list):
     """
     Fetches and processes app data for a given list of app IDs.
 
@@ -179,15 +166,12 @@ def fetch_and_process_app_data(batch_list, db):
         GameList: A GameList object containing the processed app data.
     """
     app_data = []
-    # batch_list = remove_dups(batch_list, db)
     if batch_list:
         with Pool(processes=cpu_count()) as pool:
             results = pool.map(parse_steam_request, batch_list)
             app_data.extend(filter(None, results))
 
-        final_app_data = [game for game in (parse_game_data(data) for data in app_data) if game is not None]
-
-        return GameList(games=final_app_data)
+        return app_data
     return None
 
 
@@ -203,13 +187,19 @@ def main():
     batch_size = 5
     current_batch = 0
 
+    games = GameList(games=[])
+
     for i in tqdm(range(0, len(app_id_list), batch_size)):
         current_batch += 1
         batch = app_id_list[i : i + batch_size]
-        app_data = fetch_and_process_app_data(batch, db)
+        app_data = fetch_and_process_app_data(batch)
 
         if app_data:
-            bulk_ingest_steam_data(app_data, db)
+            games.games.extend(app_data)
+
+        if games.get_num_games() >= batch_size * 10:
+            bulk_ingest_steam_data(games, db)
+            games.games = []
 
 
 if __name__ == "__main__":
