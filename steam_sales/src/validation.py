@@ -5,6 +5,10 @@ from typing import Dict, List, Optional, Union
 from dateutil import parser
 from pydantic import BaseModel, Field, HttpUrl, field_validator
 
+from settings import get_logger
+
+logger = get_logger(__file__)
+
 
 # Game ID Details
 class GameMetaData(BaseModel):
@@ -108,7 +112,7 @@ class Game(BaseModel):
                 return parsed_date
 
             except ValueError as e:
-                print(f"Error parsing date '{v}': {e}")
+                logger.error(f"Error parsing date for appid:{cls.appid}: {e}")
                 return None
 
         if v is not None and not isinstance(v, str):
@@ -133,3 +137,6 @@ class Game(BaseModel):
 
 class GameList(BaseModel):
     games: List[Game] = Field(..., description="The list of Steam games")
+
+    def get_num_games(self):
+        return len(self.games)
