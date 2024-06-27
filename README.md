@@ -49,9 +49,9 @@ To execute the ETL pipeline, use the following command:
     ```
 2. To collect steamspy data
    ```bash
-   python steam_sales/src/collect_steam_data.py --help 
+   $ python steam_sales/src/collect_steam_data.py --help 
    
-   Usage: collect_steam_data.py [OPTIONS]
+   > Usage: collect_steam_data.py [OPTIONS]
 
    Fetch and ingest data from Steam Store Database
 
