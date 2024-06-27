@@ -92,21 +92,28 @@ def bulk_ingest_steam_data(requests: GameList, db: Session):
 
     Returns:
         List[Game]: A list of newly added game documents.
+
+    Raises:
+        Exception: If there is an error during the bulk ingestion process.
     """
-    new_docs = []
+    try:
+        new_docs = []
 
-    for np in requests.games:
-        if game_exists(np.appid, db):
-            continue
+        for np in requests.games:
+            if game_exists(np.appid, db):
+                continue
 
-        new_post = model.Game(**np.model_dump())
-        new_docs.append(new_post)
+            new_post = model.Game(**np.model_dump())
+            new_docs.append(new_post)
 
-    db.bulk_save_objects(new_docs)
-    db.commit()
+        db.bulk_save_objects(new_docs)
+        db.commit()
 
-    logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
-    return new_docs
+        logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
+        return new_docs
+    except Exception as e:
+        logger.error(f"Failed to bulk ingest data: {e}")
+        return
 
 
 def game_exists(appid: str, db: Session):
