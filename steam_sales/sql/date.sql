@@ -1,0 +1,1 @@
+SELECT * FROM steam_games_raw WHERE release_date >= '2025-01-01';

@@ -101,7 +101,7 @@ class Game(BaseModel):
     genres: Optional[list] = Field(default=[], description="Genres the game belongs to")
     recommendations: int = Field(..., description="Number of recommendations from Steam users")
     achievements: int = Field(..., description="Total number of attainable achievements")
-    release_date: Optional[datetime] = Field(..., description="Date when the game was released")
+    release_date: Optional[datetime] = Field(default=None, description="Date when the game was released")
     coming_soon: bool = Field(..., description="Indicates if the game release is upcoming")
 
     @field_validator("release_date", mode="before")
@@ -116,7 +116,7 @@ class Game(BaseModel):
                 return None
 
         if v is not None and not isinstance(v, str):
-            raise ValueError("date must be a string or an integer")
+            raise ValueError(f"Date must be a string and not {type(v)}.")
 
         return v
 
