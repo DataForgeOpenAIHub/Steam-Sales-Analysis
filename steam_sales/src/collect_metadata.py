@@ -24,7 +24,7 @@ def get_request(url: str, parameters=None, max_retries=4):
     """
 
     try_count = 0
-    wait_time = 1
+    wait_time = 4
 
     while try_count < max_retries:
         try:
