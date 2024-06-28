@@ -68,6 +68,8 @@ def main():
         games = GameMetaDataList(games=json_data.values())
         bulk_ingest_meta_data(games, db)
 
+    db.close()
+
 
 if __name__ == "__main__":
     main()

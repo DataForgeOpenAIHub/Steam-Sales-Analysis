@@ -225,6 +225,8 @@ def main(
             bulk_ingest_steam_data(games, db)
             games.games = []
 
+    db.close()
+
 
 if __name__ == "__main__":
     app()

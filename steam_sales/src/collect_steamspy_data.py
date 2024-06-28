@@ -67,6 +67,8 @@ def main():
 
         bulk_ingest_steamspy_data(app_data, db)
 
+    db.close()
+
 
 if __name__ == "__main__":
     main()
