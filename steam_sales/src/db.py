@@ -12,8 +12,8 @@ engine = create_engine(
     SQLALCHAMY_DATABASE_URL,
     connect_args={
         "connect_timeout": 30,
-        "read_timeout": 10,
-        "write_timeout": 10,
+        "read_timeout": 30,
+        "write_timeout": 30,
     },
     pool_pre_ping=True,
 )
