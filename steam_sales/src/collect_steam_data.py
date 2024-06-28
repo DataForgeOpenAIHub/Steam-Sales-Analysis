@@ -43,7 +43,7 @@ def parse_steam_request(appid: int):
             if data and appid == data.appid:
                 return data
 
-    logger.error(f"Could not find data for appid {appid} in Steam Store Database")
+        logger.error(f"Could not find data for appid {appid} in Steam Store Database")
     return None
 
 
