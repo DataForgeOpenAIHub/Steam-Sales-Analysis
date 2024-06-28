@@ -112,7 +112,7 @@ class Game(BaseModel):
                 return parsed_date
 
             except ValueError as e:
-                logger.error(f"Error parsing date: {e}")
+                logger.error(f"Error parsing date: {e}: {str(v)}")
                 return None
 
         if v is not None and not isinstance(v, str):
