@@ -47,7 +47,7 @@ To execute the ETL pipeline, use the following command:
     ```bash
     python steam_sales/src/collect_metadata.py
     ```
-2. To collect steamspy data
+2. To collect steam data
    ```bash
    $ python steam_sales/src/collect_steam_data.py --help 
    
@@ -64,9 +64,9 @@ To execute the ETL pipeline, use the following command:
    │ --help                                           Show this message and exit.                                                                   │
    ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
    ```
-3. To collect steam metadata
+3. To collect steamspy metadata
     ```bash
-    python steam_sales/src/collect_steam_data.py
+    python steam_sales/src/collect_steamspy_data.py
     ```
 
 This will start the process of retrieving data from the Steamspy and Steam APIs, processing and validating it, and then loading it into the MySQL database.
