@@ -16,6 +16,7 @@ class Path:
     data_dir = os.path.join(root_dir, "data")
     sql_queries = os.path.join(package_dir, "sql")
     log_file = os.path.join(root_dir, "logs")
+    notebooks = os.path.join(package_dir, "notebooks")
 
     if not os.path.exists(log_file):
         os.mkdir(log_file)

@@ -1,4 +1,5 @@
 import time
+import warnings
 
 import requests
 from crud import bulk_ingest_meta_data
@@ -6,6 +7,8 @@ from db import get_db
 from requests.exceptions import RequestException, SSLError
 from settings import config, get_logger
 from validation import GameMetaDataList
+
+warnings.filterwarnings("ignore")
 
 logger = get_logger(__file__)
 

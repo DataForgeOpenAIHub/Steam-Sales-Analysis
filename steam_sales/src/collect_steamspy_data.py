@@ -1,4 +1,5 @@
 import os
+import warnings
 from multiprocessing import Pool, cpu_count
 
 from collect_metadata import get_request
@@ -8,6 +9,8 @@ from settings import Path, config, get_logger
 from sqlalchemy import text
 from tqdm import tqdm
 from validation import GameDetails, GameDetailsList
+
+warnings.filterwarnings("ignore")
 
 logger = get_logger(__file__)
 
