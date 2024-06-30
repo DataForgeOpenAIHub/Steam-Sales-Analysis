@@ -1,6 +1,6 @@
 # Steam Sales Analysis
 
-![banner](assets\imgs\steam_logo.jpg)
+![banner](assets/imgs/steam_logo.jpg)
 
 ## Overview
 Welcome to **Steam Sales Analysis** – an innovative project designed to harness the power of data for insights into the gaming world. We have meticulously crafted an ETL (Extract, Transform, Load) pipeline that covers every essential step: data retrieval, processing, validation, and ingestion. By leveraging the robust Steamspy and Steam APIs, we collect comprehensive game-related metadata, details, and sales figures. 
