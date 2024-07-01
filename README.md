@@ -1,6 +1,6 @@
 # Steam Sales Analysis
 
-<img src="assets/imgs/steam_logo.jpg" alt="Banner Image" style="width:100%; height:345px; object-fit:cover;">
+![banner](assets/imgs/steam_logo.jpg)
 
 
 ## Overview
