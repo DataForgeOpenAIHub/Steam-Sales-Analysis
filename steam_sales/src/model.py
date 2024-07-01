@@ -66,4 +66,13 @@ class Game(Base):
     coming_soon = Column(Boolean, nullable=True)
 
 
+class Temp(Base):
+    __tablename__ = "temp"
+
+    appid = Column(Integer, primary_key=True, nullable=False)
+    requirements = Column(JSON, nullable=True)
+    platform = Column(JSON, nullable=True)
+    release_date = Column(Text, nullable=True)
+
+
 Base.metadata.create_all(engine)
