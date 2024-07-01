@@ -63,7 +63,8 @@ def parse_game_data(data: dict):
             "platform": data["platforms"],
             "release_date": data["release_date"]["date"],
         }
-
+        logger.info(game_data)
+        logger.info(TempDetails(**game_data))
         return TempDetails(**game_data)
     except KeyError as ke:
         logger.error(f"KeyError parsing game data for `{data['steam_appid']}`: Missing key {ke}")
