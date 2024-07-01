@@ -140,3 +140,22 @@ class GameList(BaseModel):
 
     def get_num_games(self):
         return len(self.games)
+
+
+class TempDetails(BaseModel):
+    appid: int = Field(..., description="Application ID of the game")
+    requirements: Optional[dict] = Field(..., description="PC system requirements for the game")
+    platform: Optional[dict] = Field(..., description="Indicates if the game is available on PC platforms")
+    release_date: Optional[str] = Field(..., description="Date when the game was released")
+
+    @field_validator("requirements", mode="before")
+    def validate_requirements(cls, v):
+        if isinstance(v, list):
+            return {}
+
+
+class TempDetailsList(BaseModel):
+    games: List[TempDetails] = Field(..., description="The list of Steam games")
+
+    def get_num_games(self):
+        return len(self.games)
