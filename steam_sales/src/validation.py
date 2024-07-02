@@ -87,6 +87,7 @@ class Game(BaseModel):
     requirements: Optional[Dict] = Field(..., description="PC system requirements for the game")
     developers: Optional[List[str]] = Field(default=[], description="List of developers who worked on the game")
     publishers: List[str] = Field(..., description="List of publishers responsible for distributing the game")
+    price_overview: Optional[Dict] = Field(..., description="Price overview of the game with currency")
     platform: Optional[dict] = Field(..., description="Indicates if the game is available on PC platforms")
     metacritic: Optional[int] = Field(..., description="Metacritic score of the game, if available")
     categories: Optional[list] = Field(default=[], description="Categories or genres of the game")

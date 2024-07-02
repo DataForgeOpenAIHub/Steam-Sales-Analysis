@@ -56,6 +56,7 @@ class Game(Base):
     requirements = Column(JSON, nullable=True)
     developers = Column(JSON, nullable=False)
     publishers = Column(JSON, nullable=False)
+    price_overview = Column(JSON, nullable=True)
     platform = Column(JSON, nullable=True)
     metacritic = Column(Integer, nullable=True)
     categories = Column(JSON, nullable=False)
