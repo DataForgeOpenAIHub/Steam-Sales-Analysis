@@ -69,26 +69,26 @@ def parse_html_to_dict(html_content: str):
     return requirements_dict
 
 
-def requirements_parser(requirements: dict):
-    """
-    Parses the requirements dictionary and returns a dictionary with minimum and recommended requirements.
+# def requirements_parser(requirements: dict):
+#     """
+#     Parses the requirements dictionary and returns a dictionary with minimum and recommended requirements.
 
-    Args:
-        requirements (dict): A dictionary containing the minimum and recommended requirements.
+#     Args:
+#         requirements (dict): A dictionary containing the minimum and recommended requirements.
 
-    Returns:
-        dict: A dictionary with minimum and recommended requirements parsed from the input dictionary.
-    """
+#     Returns:
+#         dict: A dictionary with minimum and recommended requirements parsed from the input dictionary.
+#     """
 
-    requirements_dict = {"minimum": None, "recommended": None}
+#     requirements_dict = {"minimum": None, "recommended": None}
 
-    if "minimum" in requirements:
-        requirements_dict["minimum"] = parse_html_to_dict(requirements["minimum"])
+#     if "minimum" in requirements:
+#         requirements_dict["minimum"] = parse_html_to_dict(requirements["minimum"])
 
-    if "recommended" in requirements:
-        requirements_dict["recommended"] = parse_html_to_dict(requirements["recommended"])
+#     if "recommended" in requirements:
+#         requirements_dict["recommended"] = parse_html_to_dict(requirements["recommended"])
 
-    return requirements_dict
+#     return requirements_dict
 
 
 def text_parser(text: str):
@@ -137,10 +137,10 @@ def parse_game_data(data: dict):
             "header_image": data["header_image"],
             "capsule_image": data["capsule_image"],
             "website": data.get("website", ""),
-            "pc_requirements": requirements_parser(data["pc_requirements"]),
+            "requirements": data["pc_requirements"],
             "developers": data.get("developers", None),
             "publishers": data["publishers"],
-            "pc_platform": data["platforms"]["windows"],
+            "platform": data["platforms"],
             "metacritic": data.get("metacritic", {}).get("score", 0),
             "categories": data.get("categories", None),
             "genres": data.get("genres", None),

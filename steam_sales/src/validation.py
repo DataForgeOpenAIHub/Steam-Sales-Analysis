@@ -1,10 +1,7 @@
 import re
-from datetime import datetime
 from typing import Dict, List, Optional, Union
 
-from dateutil import parser
 from pydantic import BaseModel, Field, HttpUrl, field_validator
-
 from settings import get_logger
 
 logger = get_logger(__file__)
@@ -69,11 +66,6 @@ class GameDetailsList(BaseModel):
 
 
 # Steam Game Details
-class PCRequirements(BaseModel):
-    minimum: Optional[Dict] = Field(..., description="")
-    recommended: Optional[Dict] = Field(..., description="")
-
-
 class Game(BaseModel):
     type: str = Field(..., description="Type of the game")
     name: str = Field(..., description="Name of the game")
@@ -92,33 +84,17 @@ class Game(BaseModel):
     header_image: HttpUrl = Field(..., description="URL to the header image of the game")
     capsule_image: HttpUrl = Field(..., description="URL to the capsule (thumbnail) image of the game")
     website: Optional[HttpUrl | str] = Field(..., description="Official website of the game")
-    pc_requirements: PCRequirements = Field(..., description="PC system requirements for the game")
+    requirements: Optional[Dict] = Field(..., description="PC system requirements for the game")
     developers: Optional[List[str]] = Field(default=[], description="List of developers who worked on the game")
     publishers: List[str] = Field(..., description="List of publishers responsible for distributing the game")
-    pc_platform: bool = Field(..., description="Indicates if the game is available on PC platforms")
+    platform: Optional[dict] = Field(..., description="Indicates if the game is available on PC platforms")
     metacritic: Optional[int] = Field(..., description="Metacritic score of the game, if available")
     categories: Optional[list] = Field(default=[], description="Categories or genres of the game")
     genres: Optional[list] = Field(default=[], description="Genres the game belongs to")
     recommendations: int = Field(..., description="Number of recommendations from Steam users")
     achievements: int = Field(..., description="Total number of attainable achievements")
-    release_date: Optional[datetime] = Field(default=None, description="Date when the game was released")
+    release_date: Optional[str] = Field(..., description="Date when the game was released")
     coming_soon: bool = Field(..., description="Indicates if the game release is upcoming")
-
-    @field_validator("release_date", mode="before")
-    def validate_release_date(cls, v):
-        if isinstance(v, str):
-            try:
-                parsed_date = parser.parse(v)
-                return parsed_date
-
-            except ValueError as e:
-                logger.error(f"Error parsing date: {e}: {str(v)}")
-                return None
-
-        if v is not None and not isinstance(v, str):
-            raise ValueError(f"Date must be a string and not {type(v)}.")
-
-        return v
 
     @field_validator("required_age", mode="before")
     def validate_required_age(cls, v):
@@ -134,20 +110,6 @@ class Game(BaseModel):
 
         return v
 
-
-class GameList(BaseModel):
-    games: List[Game] = Field(..., description="The list of Steam games")
-
-    def get_num_games(self):
-        return len(self.games)
-
-
-class TempDetails(BaseModel):
-    appid: int = Field(..., description="Application ID of the game")
-    requirements: Optional[dict | list] = Field(..., description="PC system requirements for the game")
-    platform: Optional[dict] = Field(..., description="Indicates if the game is available on PC platforms")
-    release_date: Optional[str] = Field(..., description="Date when the game was released")
-
     @field_validator("requirements", mode="before")
     def validate_requirements(cls, v):
         if isinstance(v, list):
@@ -156,8 +118,8 @@ class TempDetails(BaseModel):
             return v
 
 
-class TempDetailsList(BaseModel):
-    games: List[TempDetails] = Field(..., description="The list of Steam games")
+class GameList(BaseModel):
+    games: List[Game] = Field(..., description="The list of Steam games")
 
     def get_num_games(self):
         return len(self.games)

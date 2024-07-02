@@ -1,7 +1,7 @@
 import model
 from settings import get_logger
 from sqlalchemy.orm import Session
-from validation import GameDetailsList, GameList, GameMetaDataList, TempDetailsList
+from validation import GameDetailsList, GameList, GameMetaDataList
 
 logger = get_logger(__file__)
 
@@ -128,61 +128,6 @@ def game_exists(appid: str, db: Session):
         bool: True if the game exists in the database, False otherwise.
     """
     blog = db.query(model.Game).filter(model.Game.appid == appid).first()
-    if blog:
-        logger.warning(
-            f"Document with the id '{appid}' already exists. Requesting the data from the Steam API skipped.",
-        )
-        return True
-    return False
-
-
-# to be removed
-def bulk_ingest_temp_data(requests: TempDetailsList, db: Session):
-    """
-    Bulk ingests Steam data into the database.
-
-    Args:
-        requests (GameList): A list of game requests.
-        db (Session): The database session.
-
-    Returns:
-        List[Game]: A list of newly added game documents.
-
-    Raises:
-        Exception: If there is an error during the bulk ingestion process.
-    """
-    try:
-        new_docs = []
-
-        for np in requests.games:
-            if temp_exists(np.appid, db):
-                continue
-
-            new_post = model.Temp(**np.model_dump())
-            new_docs.append(new_post)
-
-        db.bulk_save_objects(new_docs)
-        db.commit()
-
-        logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
-        return new_docs
-    except Exception as e:
-        logger.error(f"Failed to bulk ingest data: {e}")
-        return
-
-
-def temp_exists(appid: str, db: Session):
-    """
-    Check if a game with the given appid exists in the database.
-
-    Args:
-        appid (str): The appid of the game to check.
-        db (Session): The database session.
-
-    Returns:
-        bool: True if the game exists in the database, False otherwise.
-    """
-    blog = db.query(model.Temp).filter(model.Temp.appid == appid).first()
     if blog:
         logger.warning(
             f"Document with the id '{appid}' already exists. Requesting the data from the Steam API skipped.",
