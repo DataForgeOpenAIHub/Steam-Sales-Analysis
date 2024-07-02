@@ -69,28 +69,6 @@ def parse_html_to_dict(html_content: str):
     return requirements_dict
 
 
-# def requirements_parser(requirements: dict):
-#     """
-#     Parses the requirements dictionary and returns a dictionary with minimum and recommended requirements.
-
-#     Args:
-#         requirements (dict): A dictionary containing the minimum and recommended requirements.
-
-#     Returns:
-#         dict: A dictionary with minimum and recommended requirements parsed from the input dictionary.
-#     """
-
-#     requirements_dict = {"minimum": None, "recommended": None}
-
-#     if "minimum" in requirements:
-#         requirements_dict["minimum"] = parse_html_to_dict(requirements["minimum"])
-
-#     if "recommended" in requirements:
-#         requirements_dict["recommended"] = parse_html_to_dict(requirements["recommended"])
-
-#     return requirements_dict
-
-
 def text_parser(text: str):
     """
     Parses the given HTML text using BeautifulSoup and returns the plain text.
@@ -140,6 +118,7 @@ def parse_game_data(data: dict):
             "requirements": data["pc_requirements"],
             "developers": data.get("developers", None),
             "publishers": data["publishers"],
+            "price_overview": data.get("price_overview", None),
             "platform": data["platforms"],
             "metacritic": data.get("metacritic", {}).get("score", 0),
             "categories": data.get("categories", None),
