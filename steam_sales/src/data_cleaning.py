@@ -165,6 +165,7 @@ def process_developers_and_publishers(df):
                 return ";".join(filter(None, result))
         except (ValueError, SyntaxError):
             return ""
+
         return val
 
     df["developer"] = df["developers"].apply(safe_literal_eval)
