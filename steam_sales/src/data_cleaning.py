@@ -578,6 +578,10 @@ def main():
     logger.info(f"Clean steam data shape: {clean_steam_data.shape}")
     logger.info(f"Clean steamspy data shape: {clean_steamspy_data.shape}")
 
+    clean_steamspy_data_filtered = clean_steamspy_data.drop(columns=["name"])
+    game_df = pd.merge(clean_steam_data, clean_steamspy_data_filtered, on="appid")
+    logger.info(f"Game data shape: {game_df.shape}")
+
 
 if __name__ == "__main__":
     main()
