@@ -16,6 +16,7 @@ warnings.filterwarnings("ignore")
 logger = get_logger(__file__)
 
 
+# class CleanerBase:
 def fetch_data(source: str):
     """
     Fetches data from a specified source and returns it as a pandas DataFrame.
@@ -274,7 +275,8 @@ def process_controller(df):
 
 def process_dlc(df):
     """
-    Process the 'dlc' column in the given DataFrame by converting the values to the number of DLCs available for each game.
+    Process the 'dlc' column in the given DataFrame by converting the values to the number of DLCs available for each
+    game.
 
     Args:
         df (DataFrame): The input DataFrame containing the 'dlc' column.
