@@ -5,6 +5,7 @@ from ast import literal_eval
 
 import dateparser
 import pandas as pd
+import tqdm
 from bs4 import BeautifulSoup
 from db import get_db
 from settings import Path, get_logger
@@ -502,6 +503,24 @@ def rename(df):
     return df
 
 
+def process_with_progress(df, process_functions, df_name):
+    """
+    Process the DataFrame with the given list of functions, showing progress.
+
+    Args:
+        df (pandas.DataFrame): The DataFrame to be processed.
+        process_functions (list): A list of functions to apply to the DataFrame.
+        df_name (str): The name of the DataFrame being processed.
+
+    Returns:
+        pandas.DataFrame: The processed DataFrame.
+    """
+    for func in tqdm.tqdm(process_functions, desc=f"Processing {df_name} DataFrame"):
+        df = func(df)
+
+    return df
+
+
 def process_steamspy(df):
     """
     Process the given DataFrame by applying a series of cleaning operations.
@@ -511,15 +530,10 @@ def process_steamspy(df):
 
     Returns:
         pandas.DataFrame: The processed DataFrame.
-
     """
-    df = process_null(df)
-    df = process_col_rows(df)
-    df = process_owners(df)
-    df = process_tag_lang(df)
-    df = rename(df)
+    process_functions = [process_null, process_col_rows, process_owners, process_tag_lang, rename]
 
-    return df
+    return process_with_progress(df, process_functions, "SteamSpy")
 
 
 def process_steam(df):
@@ -531,23 +545,24 @@ def process_steam(df):
 
     Returns:
         pandas.DataFrame: The processed DataFrame.
-
     """
-    df = process_null(df)
-    df = process_age(df)
-    df = process_platforms(df)
-    df = process_language(df)
-    df = process_developers_and_publishers(df)
-    df = process_price(df)
-    df = process_categories_and_genres(df)
-    df = process_controller(df)
-    df = process_dlc(df)
-    df = process_requirement(df)
-    df = process_date(df)
-    df = process_descriptions(df)
-    df = misc(df)
+    process_functions = [
+        process_null,
+        process_age,
+        process_platforms,
+        process_language,
+        process_developers_and_publishers,
+        process_price,
+        process_categories_and_genres,
+        process_controller,
+        process_dlc,
+        process_requirement,
+        process_date,
+        process_descriptions,
+        misc,
+    ]
 
-    return df
+    return process_with_progress(df, process_functions, "Steam")
 
 
 def main():
@@ -557,8 +572,8 @@ def main():
     clean_steam_data = process_steam(steam_data)
     clean_steamspy_data = process_steamspy(steamspy_data)
 
-    logger.info("Clean steam data shape: ", clean_steam_data.shape)
-    logger.info("Clean steamspy data shape: ", clean_steamspy_data.shape)
+    logger.info(f"Clean steam data shape: {clean_steam_data.shape}")
+    logger.info(f"Clean steamspy data shape: {clean_steamspy_data.shape}")
 
 
 if __name__ == "__main__":
