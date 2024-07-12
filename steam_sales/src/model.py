@@ -1,5 +1,5 @@
 from db import Base, engine
-from sqlalchemy import Boolean, Column, Float, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
 from sqlalchemy.dialects.mysql import JSON, LONGTEXT
 
 
@@ -33,6 +33,7 @@ class GameMeta(Base):
 
     appid = Column(Integer, primary_key=True, nullable=False)
     name = Column(String(255), nullable=False)
+    date_added = Column(DateTime, nullable=False)
 
 
 class Game(Base):

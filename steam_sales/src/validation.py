@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, HttpUrl, field_validator
@@ -11,6 +12,7 @@ logger = get_logger(__file__)
 class GameMetaData(BaseModel):
     appid: int = Field(..., description="The application ID")
     name: str = Field(..., max_length=255, description="The name of the game")
+    date_added: datetime = Field(..., description="Date the appid was added")
 
 
 class GameMetaDataList(BaseModel):

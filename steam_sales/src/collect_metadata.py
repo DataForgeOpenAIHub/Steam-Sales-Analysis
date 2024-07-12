@@ -1,5 +1,6 @@
 import time
 import warnings
+from datetime import datetime, timezone
 
 import requests
 from crud import bulk_ingest_meta_data
@@ -64,9 +65,14 @@ def main():
     for i in range(max_pages):
         parameters = {"request": "all", "page": i}
         json_data = get_request(url, parameters)
+        current_utc_time = datetime.now(timezone.utc)
 
         if json_data is None:
-            break
+            # break
+            continue
+
+        for id in json_data.values():
+            id["date_added"] = current_utc_time
 
         games = GameMetaDataList(games=json_data.values())
         bulk_ingest_meta_data(games, db)
