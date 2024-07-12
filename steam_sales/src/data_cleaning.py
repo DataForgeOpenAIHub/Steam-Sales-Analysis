@@ -420,6 +420,15 @@ def misc(df):
 
 
 def process_col_rows(df):
+    """
+    Process the given DataFrame by dropping unnecessary columns and rows.
+
+    Args:
+        df (pandas.DataFrame): The DataFrame to be processed.
+
+    Returns:
+        pandas.DataFrame: The processed DataFrame.
+    """
     df = df.copy()
     col_to_drop = [
         "score_rank",
