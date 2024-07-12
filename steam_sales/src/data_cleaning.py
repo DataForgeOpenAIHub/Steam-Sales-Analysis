@@ -422,19 +422,17 @@ def misc(df):
 def process_col_rows(df):
     df = df.copy()
     col_to_drop = [
-        "score_rank",  # too many missing values
-        "average_forever",
-        "median_forever",  # too little variance (most have 0)
-        "userscore",  # too little variance (most have 0)
+        "score_rank",
+        "userscore",
         "genre",
         "developer",
         "publisher",
         "price",
         "initialprice",
-        "discount",  # provided by Steam data
+        "discount",
         "average_2weeks",
         "median_2weeks",
-        "ccu",  # not interested in temporally specific columns
+        "ccu",
     ]
 
     # Drop missing games
