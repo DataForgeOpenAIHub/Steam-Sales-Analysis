@@ -7,9 +7,10 @@ import dateparser
 import pandas as pd
 import tqdm
 from bs4 import BeautifulSoup
-from db import get_db
+from db import get_db, engine
 from settings import Path, get_logger
-from sqlalchemy import text
+from sqlalchemy import JSON, BigInteger, Column, DateTime, Float, Integer, MetaData, String, Table, Text, text
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 warnings.filterwarnings("ignore")
 
@@ -576,7 +577,7 @@ def process_steam(df):
 
 
 def main():
-    steam_data = fetch_data("get_all_steam_data.sql")
+    steam_data = fetch_data("get_all_steam_data.sql").loc[:1000]
     steamspy_data = fetch_data("get_all_steamspy_data.sql")
 
     clean_steam_data = process_steam(steam_data)
@@ -586,8 +587,100 @@ def main():
     logger.info(f"Clean steamspy data shape: {clean_steamspy_data.shape}")
 
     clean_steamspy_data_filtered = clean_steamspy_data.drop(columns=["name"])
-    game_df = pd.merge(clean_steam_data, clean_steamspy_data_filtered, on="appid")
-    logger.info(f"Game data shape: {game_df.shape}")
+    clean_game_df = pd.merge(clean_steam_data, clean_steamspy_data_filtered, on="appid")
+    logger.info(f"Clean game data shape: {clean_game_df.shape}")
+
+    db = get_db()
+
+    # clean_game_df.set_index("appid", inplace=True)
+
+    with engine.connect() as conn:
+        clean_game_df.to_sql(
+            name="clean_game_data",
+            con=conn,
+            if_exists="replace",
+            index=False,
+            dtype={
+                "type": Text,
+                "name": String(255),
+                "appid": Integer,
+                "required_age": Integer,
+                "controller_support": Integer,
+                "dlc": Integer,
+                "requirements": Text,
+                "platform": String(255),
+                "metacritic": Integer,
+                "categories": String(255),
+                "genres": String(255),
+                "recommendations": Integer,
+                "achievements": Integer,
+                "release_date": DateTime,
+                "coming_soon": Integer,
+                "english": Integer,
+                "developer": String(255),
+                "publisher": String(255),
+                "price": Float,
+                "description": Text,
+                "year": Integer,
+                "month": Integer,
+                "day": Integer,
+                "positive_ratings": Integer,
+                "negative_ratings": Integer,
+                "owners_in_millions": String(255),
+                "average_forever": Integer,
+                "median_forever": Integer,
+                "languages": Text,
+                "steamspy_tags": JSON,
+            },
+            chunksize=2000,
+        )
+
+        logger.info("Game data has been written to the database.")
+    # metadata = MetaData()
+
+    # clean_game_data = Table(
+    #     "clean_game_data",
+    #     metadata,
+    #     Column("appid", Integer, primary_key=True),
+    #     Column("type", Text),
+    #     Column("name", String(255)),
+    #     Column("required_age", Integer),
+    #     Column("controller_support", Integer),
+    #     Column("dlc", Integer),
+    #     Column("requirements", Text),
+    #     Column("platform", String(255)),
+    #     Column("metacritic", Integer),
+    #     Column("categories", String(255)),
+    #     Column("genres", String(255)),
+    #     Column("recommendations", Integer),
+    #     Column("achievements", Integer),
+    #     Column("release_date", DateTime),
+    #     Column("coming_soon", Integer),
+    #     Column("english", Integer),
+    #     Column("developer", String(255)),
+    #     Column("publisher", String(255)),
+    #     Column("price", Float),
+    #     Column("description", Text),
+    #     Column("year", Integer),
+    #     Column("month", Integer),
+    #     Column("day", Integer),
+    #     Column("positive_ratings", Integer),
+    #     Column("negative_ratings", Integer),
+    #     Column("owners_in_millions", String(255)),
+    #     Column("average_forever", Integer),
+    #     Column("median_forever", Integer),
+    #     Column("languages", Text),
+    #     Column("steamspy_tags", String(255)),
+    # )
+
+    # # Create the table in the database
+    # metadata.create_all(engine)
+
+    # # Assuming `clean_game_df` is already set with `appid` as index
+    # with engine.connect() as conn:
+    #     clean_game_df.to_sql(name="clean_game_data", con=conn, if_exists="replace", index=True, chunksize=2000)
+
+    db.close()
 
 
 if __name__ == "__main__":
