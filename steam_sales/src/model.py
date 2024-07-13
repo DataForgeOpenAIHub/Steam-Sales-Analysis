@@ -68,4 +68,39 @@ class Game(Base):
     coming_soon = Column(Boolean, nullable=True)
 
 
+class CleanData(Base):
+    __tablenale__ = "clean_game_data"
+
+    type = Column(Text, nullable=False)
+    name = Column(String(255), nullable=False)
+    appid = Column(Integer, primary_key=True, nullable=False)
+    required_age = Column(Integer, nullable=False)
+    controller_support = Column(Integer, nullable=False)
+    dlc = Column(Integer, nullable=False)
+    requirements = Column(Text, nullable=False)
+    platform = Column(String(255), nullable=False)
+    metacritic = Column(Integer, nullable=False)
+    categories = Column(String(255), nullable=False)
+    genres = Column(String(255), nullable=False)
+    recommendations = Column(Integer, nullable=False)
+    achievements = Column(Integer, nullable=False)
+    release_date = Column(DateTime, nullable=True)
+    coming_soon = Column(Integer, nullable=False)
+    english = Column(Integer, nullable=False)
+    developer = Column(String(255), nullable=False)
+    publisher = Column(String(255), nullable=False)
+    price = Column(Float, nullable=False)
+    description = Column(Text, nullable=False)
+    year = Column(Integer, nullable=True)
+    month = Column(Integer, nullable=True)
+    day = Column(Integer, nullable=True)
+    positive_ratings = Column(Integer, nullable=False)
+    negative_ratings = Column(Integer, nullable=False)
+    owners_in_millions = Column(String(255), nullable=False)
+    average_forever = Column(Integer, nullable=False)
+    median_forever = Column(Integer, nullable=False)
+    languages = Column(Text, nullable=False)
+    steamspy_tags = Column(JSON, nullable=False)
+
+
 Base.metadata.create_all(engine)
