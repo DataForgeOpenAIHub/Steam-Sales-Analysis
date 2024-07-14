@@ -597,15 +597,13 @@ def main():
     batch_size = 1000
     clean_game_df_chunks = np.array_split(clean_game_df, len(clean_game_df) // batch_size + 1)
 
-    for chunk in clean_game_df_chunks:
-        bulk_data = []
+    for chunk in tqdm.tqdm(clean_game_df_chunks, desc="Batch progress"):
+        bulk_data = CleanList(games=[])
         for i in range(chunk.shape[0]):
             data = chunk.iloc[i].to_dict()
-            vali = Clean(**data)
-            bulk_data.append(vali)
+            bulk_data.games.append(Clean(**data))
 
-        x = CleanList(games=bulk_data)
-        bulk_ingest_clean_data(x, db)
+        bulk_ingest_clean_data(bulk_data, db)
 
     logger.info("Game data has been written to the database.")
 
