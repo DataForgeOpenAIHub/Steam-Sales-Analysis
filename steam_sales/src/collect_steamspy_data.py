@@ -61,10 +61,8 @@ def main():
     logger.info(f"{len(app_id_list)} ID's found")
 
     batch_size = 1000
-    current_batch = 0
 
     for i in tqdm(range(0, len(app_id_list), batch_size)):
-        current_batch += 1
         batch = app_id_list[i : i + batch_size]
         app_data = fetch_and_process_app_data(batch)
 
