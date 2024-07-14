@@ -129,7 +129,7 @@ class GameList(BaseModel):
 
 
 # # Clean Data Details
-class CleanData(BaseModel):
+class Clean(BaseModel):
     type: str = Field(..., description="Type of the game")
     name: str = Field(..., max_length=255, description="Name of the game")
     appid: int = Field(..., description="Application ID of the game")
@@ -161,6 +161,13 @@ class CleanData(BaseModel):
     languages: str = Field(..., description="Supported languages")
     steamspy_tags: Dict[str, int] = Field(..., description="Tags associated with the game")
 
+    @field_validator("steamspy_tags", mode="before")
+    def validate_steamspy_tags(cls, v):
+        if isinstance(v, str):
+            v = eval(v)
+
+        return v
+
 
 class CleanList(BaseModel):
-    games: List[CleanData] = Field(..., description="The list of Steam games")
+    games: List[Clean] = Field(..., description="The list of Steam games")
