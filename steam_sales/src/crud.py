@@ -1,7 +1,7 @@
 import model
 from settings import get_logger
 from sqlalchemy.orm import Session
-from validation import GameDetailsList, GameList, GameMetaDataList
+from validation import CleanList, GameDetailsList, GameList, GameMetaDataList
 
 logger = get_logger(__file__)
 
@@ -134,3 +134,17 @@ def game_exists(appid: str, db: Session):
         )
         return True
     return False
+
+
+def bulk_ingest_clean_data(requests: CleanList, db: Session):
+    new_docs = []
+
+    for np in requests.games:
+        new_post = model.CleanData(**np.model_dump())
+        new_docs.append(new_post)
+
+    db.bulk_save_objects(new_docs)
+    db.commit()
+
+    logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
+    return new_docs
