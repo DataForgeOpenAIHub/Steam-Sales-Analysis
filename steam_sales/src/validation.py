@@ -2,6 +2,7 @@ import re
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Union
 
+import pandas as pd
 from pydantic import BaseModel, Field, HttpUrl, field_validator
 from settings import get_logger
 
@@ -168,6 +169,22 @@ class Clean(BaseModel):
 
         return v
 
+    @field_validator("release_date", mode="before")
+    def validate_release_date(cls, v):
+        if pd.isna(v):
+            return None
+        elif isinstance(v, datetime):
+            return v
+        else:
+            return None
+
+    @field_validator("day", "month", "year", mode="before")
+    def validate_release_date_components(cls, v):
+        if isinstance(v, int):
+            return v
+        else:
+            return None
+
 
 class CleanList(BaseModel):
     games: List[Clean] = Field(..., description="The list of Steam games")
@@ -178,7 +195,7 @@ class LastRun(BaseModel):
     last_run: Optional[datetime] = Field(datetime.now(timezone.utc), description="Last run time")
 
     @field_validator("scraper", mode="before")
-    def validate_steamspy_tags(cls, v):
+    def validate_scraper(cls, v):
         allowed = ["meta", "steamspy", "steam"]
         if isinstance(v, str):
             if v in allowed:
