@@ -4,13 +4,15 @@ import warnings
 from ast import literal_eval
 
 import dateparser
+import numpy as np
 import pandas as pd
 import tqdm
 from bs4 import BeautifulSoup
-from db import get_db, engine
+from crud import bulk_ingest_clean_data
+from db import get_db
 from settings import Path, get_logger
-from sqlalchemy import JSON, BigInteger, Column, DateTime, Float, Integer, MetaData, String, Table, Text, text
-from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy import text
+from validation import Clean, CleanList
 
 warnings.filterwarnings("ignore")
 
@@ -577,7 +579,7 @@ def process_steam(df):
 
 
 def main():
-    steam_data = fetch_data("get_all_steam_data.sql").loc[:1000]
+    steam_data = fetch_data("get_all_steam_data.sql")
     steamspy_data = fetch_data("get_all_steamspy_data.sql")
 
     clean_steam_data = process_steam(steam_data)
@@ -592,50 +594,20 @@ def main():
 
     db = get_db()
 
-    # clean_game_df.set_index("appid", inplace=True)
+    batch_size = 1000
+    clean_game_df_chunks = np.array_split(clean_game_df, len(clean_game_df) // batch_size + 1)
 
-    # with engine.connect() as conn:
-    #     clean_game_df.to_sql(
-    #         name="clean_game_data",
-    #         con=conn,
-    #         if_exists="replace",
-    #         index=False,
-    #         dtype={
-    #             "type": Text,
-    #             "name": String(255),
-    #             "appid": Integer,
-    #             "required_age": Integer,
-    #             "controller_support": Integer,
-    #             "dlc": Integer,
-    #             "requirements": Text,
-    #             "platform": String(255),
-    #             "metacritic": Integer,
-    #             "categories": String(255),
-    #             "genres": String(255),
-    #             "recommendations": Integer,
-    #             "achievements": Integer,
-    #             "release_date": DateTime,
-    #             "coming_soon": Integer,
-    #             "english": Integer,
-    #             "developer": String(255),
-    #             "publisher": String(255),
-    #             "price": Float,
-    #             "description": Text,
-    #             "year": Integer,
-    #             "month": Integer,
-    #             "day": Integer,
-    #             "positive_ratings": Integer,
-    #             "negative_ratings": Integer,
-    #             "owners_in_millions": String(255),
-    #             "average_forever": Integer,
-    #             "median_forever": Integer,
-    #             "languages": Text,
-    #             "steamspy_tags": JSON,
-    #         },
-    #         chunksize=2000,
-    #     )
+    for chunk in clean_game_df_chunks:
+        bulk_data = []
+        for i in range(chunk.shape[0]):
+            data = chunk.iloc[i].to_dict()
+            vali = Clean(**data)
+            bulk_data.append(vali)
 
-    #     logger.info("Game data has been written to the database.")
+        x = CleanList(games=bulk_data)
+        bulk_ingest_clean_data(x, db)
+
+    logger.info("Game data has been written to the database.")
 
     db.close()
 
