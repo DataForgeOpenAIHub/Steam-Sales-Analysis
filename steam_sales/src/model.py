@@ -69,7 +69,7 @@ class Game(Base):
 
 
 class CleanData(Base):
-    __tablenale__ = "clean_game_data"
+    __tablename__ = "clean_game_data"
 
     type = Column(Text, nullable=False)
     name = Column(String(255), nullable=False)
