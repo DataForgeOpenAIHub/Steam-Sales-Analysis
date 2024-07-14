@@ -17,7 +17,6 @@ def remove_duplicates_meta(all_data: GameMetaDataList, unique_games: list = []) 
     Returns:
         GameMetaDataList: A new list of game metadata without duplicates.
     """
-
     seen_appids = set(unique_games)
     unique_games = []
 
@@ -137,6 +136,16 @@ def game_exists(appid: str, db: Session):
 
 
 def bulk_ingest_clean_data(requests: CleanList, db: Session):
+    """
+    Bulk ingests clean data into the database.
+
+    Args:
+        requests (CleanList): A list of clean data requests.
+        db (Session): The database session.
+
+    Returns:
+        List[CleanData]: A list of newly added clean data documents.
+    """
     new_docs = []
 
     for np in requests.games:
@@ -151,6 +160,13 @@ def bulk_ingest_clean_data(requests: CleanList, db: Session):
 
 
 def log_last_run_time(log: LastRun, db: Session):
+    """
+    Log the last run time for a scraper.
+
+    Args:
+        log (LastRun): The last run time log.
+        db (Session): The database session.
+    """
     entry = db.query(model.LastRun).filter(model.LastRun.scraper == log.scraper)
     if not entry.first():
         new_entry = model.LastRun(**log.model_dump())
