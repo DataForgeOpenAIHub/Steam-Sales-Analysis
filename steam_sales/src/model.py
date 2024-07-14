@@ -103,4 +103,11 @@ class CleanData(Base):
     steamspy_tags = Column(JSON, nullable=False)
 
 
+class LastRun(Base):
+    __tablename__ = "last_run"
+
+    scraper = Column(String(10), primary_key=True, doc="Options; meta, steamspy, steam")
+    last_run = Column(DateTime, nullable=False)
+
+
 Base.metadata.create_all(engine)

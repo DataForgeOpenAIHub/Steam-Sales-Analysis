@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, HttpUrl, field_validator
@@ -12,7 +12,7 @@ logger = get_logger(__file__)
 class GameMetaData(BaseModel):
     appid: int = Field(..., description="The application ID")
     name: str = Field(..., max_length=255, description="The name of the game")
-    date_added: datetime = Field(..., description="Date the appid was added")
+    date_added: Optional[datetime] = Field(datetime.now(timezone.utc), description="Date the appid was added")
 
 
 class GameMetaDataList(BaseModel):
@@ -171,3 +171,17 @@ class Clean(BaseModel):
 
 class CleanList(BaseModel):
     games: List[Clean] = Field(..., description="The list of Steam games")
+
+
+class LastRun(BaseModel):
+    scraper: str = Field(..., description="Script executed")
+    last_run: Optional[datetime] = Field(datetime.now(timezone.utc), description="Last run time")
+
+    @field_validator("scraper", mode="before")
+    def validate_steamspy_tags(cls, v):
+        allowed = ["meta", "steamspy", "steam"]
+        if isinstance(v, str):
+            if v in allowed:
+                return v.lower()
+
+        raise ValueError(f"Invalid value for scraper: {v}. Allowed types are {allowed}")

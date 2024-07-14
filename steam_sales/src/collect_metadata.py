@@ -3,11 +3,11 @@ import warnings
 from datetime import datetime, timezone
 
 import requests
-from crud import bulk_ingest_meta_data
+from crud import bulk_ingest_meta_data, log_last_run_time
 from db import get_db
 from requests.exceptions import RequestException, SSLError
 from settings import config, get_logger
-from validation import GameMetaDataList
+from validation import GameMetaDataList, LastRun
 
 warnings.filterwarnings("ignore")
 
@@ -61,23 +61,21 @@ def main():
     url = config.STEAMSPY_BASE_URL
     db = get_db()
 
-    max_pages = 100
+    max_pages = 10
     for i in range(max_pages):
         parameters = {"request": "all", "page": i}
         json_data = get_request(url, parameters)
-        current_utc_time = datetime.now(timezone.utc)
 
         if json_data is None:
-            # break
             continue
-
-        for id in json_data.values():
-            id["date_added"] = current_utc_time
 
         games = GameMetaDataList(games=json_data.values())
         bulk_ingest_meta_data(games, db)
 
     db.close()
+
+    last_run = LastRun(scraper="meta")
+    log_last_run_time(last_run, db)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 import model
 from settings import get_logger
 from sqlalchemy.orm import Session
-from validation import CleanList, GameDetailsList, GameList, GameMetaDataList
+from validation import CleanList, GameDetailsList, GameList, GameMetaDataList, LastRun
 
 logger = get_logger(__file__)
 
@@ -148,3 +148,15 @@ def bulk_ingest_clean_data(requests: CleanList, db: Session):
 
     logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
     return new_docs
+
+
+def log_last_run_time(log: LastRun, db: Session):
+    entry = db.query(model.LastRun).filter(model.LastRun.scraper == log.scraper)
+    if not entry.first():
+        new_entry = model.LastRun(**log.model_dump())
+        db.add(new_entry)
+    else:
+        entry.update(log.model_dump())
+
+    db.commit()
+    logger.info(f"Updated last run time for {log.scraper}")
