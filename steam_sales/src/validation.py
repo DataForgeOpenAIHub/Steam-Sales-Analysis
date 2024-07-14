@@ -126,3 +126,41 @@ class GameList(BaseModel):
 
     def get_num_games(self):
         return len(self.games)
+
+
+# # Clean Data Details
+class CleanData(BaseModel):
+    type: str = Field(..., description="Type of the game")
+    name: str = Field(..., max_length=255, description="Name of the game")
+    appid: int = Field(..., description="Application ID of the game")
+    required_age: int = Field(..., description="Minimum required age to play the game.")
+    controller_support: int = Field(..., description="Type of controller support for the game, if available")
+    dlc: int = Field(..., description="List of downloadable content IDs associated with the game, if any")
+    requirements: str = Field(..., description="PC system requirements for the game")
+    platform: str = Field(..., description="Indicates if the game is available on PC platforms")
+    metacritic: int = Field(..., description="Metacritic score of the game, if available")
+    categories: str = Field(..., description="Categories or genres of the game")
+    genres: str = Field(..., description="Genres the game belongs to")
+    recommendations: int = Field(..., description="Number of recommendations from Steam users")
+    achievements: int = Field(..., description="Total number of attainable achievements")
+    release_date: Optional[datetime] = Field(None, description="Date when the game was released")
+    coming_soon: int = Field(..., description="Indicates if the game release is upcoming")
+    english: int = Field(..., description="Indicates if the game supports English language")
+    developer: str = Field(..., description="Developer of the game")
+    publisher: str = Field(..., description="Publisher of the game")
+    price: float = Field(..., description="Current price of the game")
+    description: str = Field(..., description="Description of the game")
+    year: Optional[int] = Field(None, description="Year of the game release")
+    month: Optional[int] = Field(None, description="Month of the game release")
+    day: Optional[int] = Field(None, description="Day of the game release")
+    positive_ratings: int = Field(..., description="Number of positive ratings")
+    negative_ratings: int = Field(..., description="Number of negative ratings")
+    owners_in_millions: str = Field(..., description="Number of owners in millions")
+    average_forever: int = Field(..., description="Average playtime forever in minutes")
+    median_forever: int = Field(..., description="Median playtime forever in minutes")
+    languages: str = Field(..., description="Supported languages")
+    steamspy_tags: Dict[str, int] = Field(..., description="Tags associated with the game")
+
+
+class CleanList(BaseModel):
+    games: List[CleanData] = Field(..., description="The list of Steam games")
