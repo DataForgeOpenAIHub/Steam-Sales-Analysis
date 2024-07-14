@@ -1,6 +1,5 @@
 import time
 import warnings
-from datetime import datetime, timezone
 
 import requests
 from crud import bulk_ingest_meta_data, log_last_run_time
