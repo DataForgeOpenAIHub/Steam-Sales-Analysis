@@ -155,7 +155,7 @@ def bulk_ingest_clean_data(requests: CleanList, db: Session):
     db.bulk_save_objects(new_docs)
     db.commit()
 
-    logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
+    # logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
     return new_docs
 
 
