@@ -34,6 +34,7 @@ class GameMeta(Base):
     appid = Column(Integer, primary_key=True, nullable=False)
     name = Column(String(255), nullable=False)
     date_added = Column(DateTime, nullable=False)
+    dne = Column(Boolean, nullable=False, doc="Flag App ID does not exist in database")
 
 
 class Game(Base):

@@ -51,7 +51,7 @@ def get_request(url: str, parameters=None, max_retries=4):
         time.sleep(wait_time)
         wait_time *= 4
 
-    logger.error(f"Failed to retrieve data from {url}, params={parameters} after {max_retries} retries.")
+    logger.error(f"Failed to retrieve data from {url}?appids={parameters['appids']} after {max_retries} retries.")
 
     return None
 
@@ -60,7 +60,7 @@ def main():
     url = config.STEAMSPY_BASE_URL
     db = get_db()
 
-    max_pages = 10
+    max_pages = 100
     for i in range(max_pages):
         parameters = {"request": "all", "page": i}
         json_data = get_request(url, parameters)

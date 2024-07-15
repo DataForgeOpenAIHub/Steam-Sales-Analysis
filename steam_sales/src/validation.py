@@ -10,10 +10,17 @@ logger = get_logger(__file__)
 
 
 # Game ID Details
+def get_current_utc_time():
+    return datetime.now(timezone.utc)
+
+
 class GameMetaData(BaseModel):
     appid: int = Field(..., description="The application ID")
     name: str = Field(..., max_length=255, description="The name of the game")
-    date_added: Optional[datetime] = Field(datetime.now(timezone.utc), description="Date the appid was added")
+    date_added: Optional[datetime] = Field(
+        ..., default_factory=get_current_utc_time, description="Date the appid was added"
+    )
+    dne: Optional[bool] = Field(False, description="Flag App ID does not exist in database")
 
 
 class GameMetaDataList(BaseModel):

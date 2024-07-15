@@ -176,3 +176,18 @@ def log_last_run_time(log: LastRun, db: Session):
 
     db.commit()
     logger.info(f"Updated last run time for {log.scraper}")
+
+
+def flag_faulty_appid(appid: int, db: Session):
+    """
+    Flag an appid as faulty in the database.
+
+    Args:
+        appid (int): The appid to flag as faulty.
+        db (Session): The database session.
+    """
+    entry = db.query(model.GameMeta).filter(model.GameMeta.appid == appid)
+    if entry.first():
+        entry.update({"dne": True})
+    db.commit()
+    logger.info(f"Flagged app ID '{appid}' as faulty")

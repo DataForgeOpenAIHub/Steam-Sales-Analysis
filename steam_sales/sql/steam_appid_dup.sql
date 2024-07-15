@@ -4,5 +4,5 @@ WHERE appid NOT IN (
         SELECT appid
         FROM steam_games_raw
     )
-ORDER BY
-    appid ASC;
+    AND NOT dne
+ORDER BY appid ASC;

@@ -5,7 +5,7 @@ from multiprocessing import Pool, cpu_count
 import typer
 from bs4 import BeautifulSoup
 from collect_metadata import get_request
-from crud import bulk_ingest_steam_data
+from crud import bulk_ingest_steam_data, flag_faulty_appid
 from db import get_db
 from settings import Path, config, get_logger
 from sqlalchemy import text
@@ -44,6 +44,11 @@ def parse_steam_request(appid: int):
                 return data
 
         logger.error(f"Could not find data for appid {appid} in Steam Store Database")
+
+        db = get_db()
+        flag_faulty_appid(appid, db)
+        db.close()
+
     return None
 
 
@@ -136,7 +141,7 @@ def parse_game_data(data: dict):
     return None
 
 
-def fetch_and_process_app_data(batch_list):
+def fetch_and_process_app_data(batch_list: list):
     """
     Fetches and processes app data for a given list of app IDs.
 
