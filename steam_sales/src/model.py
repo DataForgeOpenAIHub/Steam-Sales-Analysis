@@ -72,7 +72,6 @@ class Game(Base):
 class CleanData(Base):
     __tablename__ = "clean_game_data"
 
-    type = Column(Text, nullable=False)
     name = Column(String(255), nullable=False)
     appid = Column(Integer, primary_key=True, nullable=False)
     required_age = Column(Integer, nullable=False)

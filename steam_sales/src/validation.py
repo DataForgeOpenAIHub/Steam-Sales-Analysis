@@ -138,7 +138,6 @@ class GameList(BaseModel):
 
 # # Clean Data Details
 class Clean(BaseModel):
-    type: str = Field(..., description="Type of the game")
     name: str = Field(..., max_length=255, description="Name of the game")
     appid: int = Field(..., description="Application ID of the game")
     required_age: int = Field(..., description="Minimum required age to play the game.")
