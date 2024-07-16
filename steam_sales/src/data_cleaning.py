@@ -411,7 +411,7 @@ def misc(df):
     pandas.DataFrame: The cleaned DataFrame.
     """
     df = df.copy()
-    col_to_drop = ["capsule_image", "reviews"]
+    col_to_drop = ["capsule_image", "reviews", "type"]
 
     df["year"] = df["release_date"].dt.year.astype("Int16")
     df["month"] = df["release_date"].dt.month.astype("Int16")
