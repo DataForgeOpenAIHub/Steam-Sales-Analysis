@@ -579,8 +579,13 @@ def process_steam(df):
 
 
 def main():
+    # steam_data = fetch_data("get_new_steam_data.sql")
+    # steamspy_data = fetch_data("get_new_steamspy_data.sql")
     steam_data = fetch_data("get_all_steam_data.sql")
     steamspy_data = fetch_data("get_all_steamspy_data.sql")
+    logger.info(
+        f"{steam_data.shape[0]} new data found in Steam table and {steamspy_data.shape[0]} new data found in SteamSpy table"
+    )
 
     clean_steam_data = process_steam(steam_data)
     clean_steamspy_data = process_steamspy(steamspy_data)
