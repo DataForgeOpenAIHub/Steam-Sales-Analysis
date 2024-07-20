@@ -87,7 +87,7 @@ This will start the process of retrieving data from the Steamspy and Steam APIs,
 ---
 
 #### LICENSE
-This repository is licensed under the `MIT License` License. See the [LICENSE](LICENSE) file for details.
+This repository is licensed under the `MIT License`. See the [LICENSE](LICENSE) file for details.
 
 #### Disclaimer
 
