@@ -2,6 +2,7 @@ import time
 import warnings
 
 import requests
+from tqdm import tqdm
 from crud import bulk_ingest_meta_data, log_last_run_time
 from db import get_db
 from requests.exceptions import RequestException, SSLError
@@ -61,7 +62,7 @@ def main():
     db = get_db()
 
     max_pages = 100
-    for i in range(max_pages):
+    for i in tqdm(range(max_pages)):
         parameters = {"request": "all", "page": i}
         json_data = get_request(url, parameters)
 
