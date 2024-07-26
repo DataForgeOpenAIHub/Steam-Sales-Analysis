@@ -2,16 +2,20 @@ import time
 import warnings
 
 import requests
-from tqdm import tqdm
+import typer
 from crud import bulk_ingest_meta_data, log_last_run_time
 from db import get_db
 from requests.exceptions import RequestException, SSLError
 from settings import config, get_logger
+from tqdm import tqdm
+from typer import Typer
+from typing_extensions import Annotated
 from validation import GameMetaDataList, LastRun
 
 warnings.filterwarnings("ignore")
 
 logger = get_logger(__file__)
+app = Typer(name="SteamSpy Metadata Collector")
 
 
 def get_request(url: str, parameters=None, max_retries=4):
@@ -57,11 +61,17 @@ def get_request(url: str, parameters=None, max_retries=4):
     return None
 
 
-def main():
+@app.command(name="fetch_metadata", help="Fetch and ingest metadata from SteamSpy Database")
+def main(max_pages: Annotated[int, typer.Option(help="Number of pages to fetch from.")] = 100):
+    """
+    Fetches game metadata from SteamSpy API and stores it in a database.
+
+    Args:
+        max_pages (int, optional): Number of pages to fetch from. Defaults to 100.
+    """
     url = config.STEAMSPY_BASE_URL
     db = get_db()
 
-    max_pages = 100
     for i in tqdm(range(max_pages)):
         parameters = {"request": "all", "page": i}
         json_data = get_request(url, parameters)
@@ -79,4 +89,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    app()
