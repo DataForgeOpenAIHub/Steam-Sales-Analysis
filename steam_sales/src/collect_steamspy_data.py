@@ -57,6 +57,13 @@ def fetch_and_process_app_data(app_id_list):
 
 @app.command(name="fetch_steamspy_data", help="Fetch and ingest data from SteamSpy Database")
 def main(batch_size: Annotated[int, typer.Option(help="Batch size")] = 1000):
+    """
+    Collects SteamSpy data for a list of app IDs in batches and ingests the data into a database.
+
+    Args:
+        batch_size (int, optional): The number of app IDs to process in each batch. Defaults to 1000.
+    """
+
     db = get_db()
     with open(os.path.join(Path.sql_queries, "steamspy_appid_dup.sql"), "r") as f:
         query = text(f.read())
