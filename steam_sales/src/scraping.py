@@ -14,7 +14,7 @@ logger = get_logger(__file__)
 warnings.filterwarnings("ignore")
 
 
-class BaseScraper(ABC):
+class BaseFetcher(ABC):
     def __init__(self):
         pass
 
@@ -67,7 +67,7 @@ class BaseScraper(ABC):
         pass
 
 
-class MetadataScraper(BaseScraper):
+class SteamSpyMetadataFetcher(BaseFetcher):
     def __init__(self, max_pages: int = 100):
         super().__init__()
 
@@ -96,5 +96,5 @@ class MetadataScraper(BaseScraper):
 
 
 if __name__ == "__main__":
-    scraper = MetadataScraper(max_pages=4)
+    scraper = SteamSpyMetadataFetcher(max_pages=4)
     scraper.run()
