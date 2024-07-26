@@ -1,14 +1,17 @@
+import os
 import time
 import warnings
 from abc import ABC, abstractmethod
+from multiprocessing import Pool, cpu_count
 
 import requests
-from crud import bulk_ingest_meta_data, log_last_run_time
+from crud import bulk_ingest_meta_data, bulk_ingest_steamspy_data, log_last_run_time
 from db import get_db
 from requests.exceptions import RequestException, SSLError
-from settings import config, get_logger
+from settings import Path, config, get_logger
+from sqlalchemy import text
 from tqdm import tqdm
-from validation import GameMetaDataList, LastRun
+from validation import GameDetails, GameDetailsList, GameMetaDataList, LastRun
 
 logger = get_logger(__file__)
 warnings.filterwarnings("ignore")
@@ -62,6 +65,11 @@ class BaseFetcher(ABC):
 
         return None
 
+    def get_sql_query(self, file_name: str):
+        with open(os.path.join(Path.sql_queries, file_name), "r") as f:
+            query = text(f.read())
+        return query
+
     @abstractmethod
     def run(self):
         pass
@@ -91,6 +99,70 @@ class SteamSpyMetadataFetcher(BaseFetcher):
 
         last_run = LastRun(scraper="meta")
         log_last_run_time(last_run, db)
+
+        db.close()
+
+
+class SteamSpyFetcher(BaseFetcher):
+    def __init__(self, batch_size: int = 1000):
+        super().__init__()
+
+        self.url = config.STEAMSPY_BASE_URL
+        self.batch_size = batch_size
+
+    def parse_steamspy_request(self, appid: int):
+        """
+        Parses the SteamSpy request for a specific app ID.
+
+        Args:
+            appid (int): The ID of the app to retrieve details for.
+
+        Returns:
+            GameDetails: An instance of the GameDetails class containing the parsed data.
+        """
+        url = config.STEAMSPY_BASE_URL
+        parameters = {"request": "appdetails", "appid": appid}
+        json_data = self.get_request(url, parameters)
+
+        return GameDetails(**json_data)
+
+    def fetch_and_process_app_data(self, app_id_list):
+        """
+        Fetches and processes app data for a given list of app IDs.
+
+        Args:
+            app_id_list (list): A list of app IDs to fetch data for.
+
+        Returns:
+            GameDetailsList: A list of game details objects containing the fetched app data.
+        """
+
+        app_data = []
+        with Pool(processes=cpu_count()) as pool:
+            results = pool.map(self.parse_steamspy_request, app_id_list)
+            app_data.extend(filter(None, results))
+
+        return GameDetailsList(games=app_data)
+
+    def run(self):
+        """
+        Collects SteamSpy data for a list of app IDs in batches and ingests the data into a database.
+
+        Args:
+            batch_size (int, optional): The number of app IDs to process in each batch. Defaults to 1000.
+        """
+        db = get_db()
+        query = self.get_sql_query("steamspy_appid_dup.sql")
+
+        result = db.execute(query)
+        app_id_list = [row[0] for row in result.fetchall()]
+        logger.info(f"{len(app_id_list)} ID's found")
+
+        for i in tqdm(range(0, len(app_id_list), self.batch_size)):
+            batch = app_id_list[i : i + self.batch_size]
+            app_data = self.fetch_and_process_app_data(batch)
+
+            bulk_ingest_steamspy_data(app_data, db)
 
         db.close()
 
