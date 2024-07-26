@@ -2,17 +2,21 @@ import os
 import warnings
 from multiprocessing import Pool, cpu_count
 
+import typer
 from collect_metadata import get_request
 from crud import bulk_ingest_steamspy_data
 from db import get_db
 from settings import Path, config, get_logger
 from sqlalchemy import text
 from tqdm import tqdm
+from typer import Typer
+from typing_extensions import Annotated
 from validation import GameDetails, GameDetailsList
 
 warnings.filterwarnings("ignore")
 
 logger = get_logger(__file__)
+app = Typer(name="SteamSpy Data Collector")
 
 
 def parse_steamspy_request(appid: int):
@@ -51,7 +55,8 @@ def fetch_and_process_app_data(app_id_list):
     return GameDetailsList(games=app_data)
 
 
-def main():
+@app.command(name="fetch_steamspy_data", help="Fetch and ingest data from SteamSpy Database")
+def main(batch_size: Annotated[int, typer.Option(help="Batch size")] = 1000):
     db = get_db()
     with open(os.path.join(Path.sql_queries, "steamspy_appid_dup.sql"), "r") as f:
         query = text(f.read())
@@ -59,8 +64,6 @@ def main():
     result = db.execute(query)
     app_id_list = [row[0] for row in result.fetchall()]
     logger.info(f"{len(app_id_list)} ID's found")
-
-    batch_size = 1000
 
     for i in tqdm(range(0, len(app_id_list), batch_size)):
         batch = app_id_list[i : i + batch_size]
