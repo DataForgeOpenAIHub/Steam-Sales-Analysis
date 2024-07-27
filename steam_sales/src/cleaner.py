@@ -142,8 +142,6 @@ class SteamSpyCleaner(BaseCleaner):
 
         self.col_to_drop = [
             "score_rank",  # too many missing values
-            "average_forever",
-            "median_forever",  # too little variance (most have 0)
             "userscore",  # too little variance (most have 0)
             "genre",
             "developer",
@@ -161,7 +159,7 @@ class SteamSpyCleaner(BaseCleaner):
         df.drop(columns=self.col_to_drop, inplace=True)
         return df
 
-    def process_owners(df):
+    def process_owners(self, df):
         """
         Process the 'owners' column in the given DataFrame.
 
@@ -192,7 +190,7 @@ class SteamSpyCleaner(BaseCleaner):
         )
         return df
 
-    def rename(df):
+    def rename(self, df):
         df.rename(
             columns={
                 "tags": "steamspy_tags",
@@ -260,7 +258,6 @@ class SteamStoreCleaner(BaseCleaner):
         return df
 
     def process_developers_and_publishers(self, df: pd.DataFrame) -> pd.DataFrame:
-
         pattern = r'(?i)\["(n/a|na|null)"\]'
         df = df[
             (df["developers"].notna())
@@ -429,3 +426,8 @@ class SteamDataClean:
                 bulk_ingest_clean_data(bulk_data, db)
 
         self.logger.info("Game data has been written to the database.")
+
+
+if __name__ == "__main__":
+    cleaner = SteamDataClean()
+    cleaner.ingest()
