@@ -368,10 +368,12 @@ class SteamStoreFetcher(BaseFetcher):
         self.logger.info(f"Successfully added {new_docs_added} documents to the 'steam_games_raw' table")
 
 
-# if __name__ == "__main__":
-# fetcher = SteamStoreFetcher()
-# fetcher.run()
-# fetcher = SteamSpyFetcher()
-# fetcher.run()
-# fetcher = SteamSpyMetadataFetcher(max_pages=3)
-# fetcher.run()
+if __name__ == "__main__":
+    fetcher = SteamSpyMetadataFetcher(max_pages=100)
+    fetcher.run()
+
+    fetcher = SteamSpyFetcher()
+    fetcher.run()
+
+    fetcher = SteamStoreFetcher()
+    fetcher.run()
