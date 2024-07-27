@@ -2,6 +2,7 @@ import os
 import time
 import warnings
 from abc import ABC, abstractmethod
+from functools import wraps
 from multiprocessing import Pool, cpu_count
 
 import requests
@@ -77,6 +78,22 @@ class BaseFetcher(ABC):
             query = text(f.read())
         return query
 
+    @staticmethod
+    def log_last_run(scraper_name):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                result = func(*args, **kwargs)
+                db = get_db()
+                last_run = LastRun(scraper=scraper_name)
+                log_last_run_time(last_run, db)
+                db.close()
+                return result
+
+            return wrapper
+
+        return decorator
+
     @abstractmethod
     def run(self):
         pass
@@ -89,6 +106,7 @@ class SteamSpyMetadataFetcher(BaseFetcher):
         self.max_pages = max_pages
         self.url = config.STEAMSPY_BASE_URL
 
+    @BaseFetcher.log_last_run(scraper_name="meta")
     def run(self):
         """
         Fetches game metadata from SteamSpy API and stores it in a database.
@@ -103,9 +121,6 @@ class SteamSpyMetadataFetcher(BaseFetcher):
 
             games = GameMetaDataList(games=json_data.values())
             bulk_ingest_meta_data(games, db)
-
-        last_run = LastRun(scraper="meta")
-        log_last_run_time(last_run, db)
 
         db.close()
 
@@ -151,6 +166,7 @@ class SteamSpyFetcher(BaseFetcher):
 
         return GameDetailsList(games=app_data)
 
+    @BaseFetcher.log_last_run(scraper_name="steamspy")
     def run(self):
         """
         Collects SteamSpy data for a list of app IDs in batches and ingests the data into a database.
@@ -320,6 +336,7 @@ class SteamStoreFetcher(BaseFetcher):
             return app_data
         return None
 
+    @BaseFetcher.log_last_run(scraper_name="steam")
     def run(self):
         """
         This command fetches unique app IDs from the Steam Store Database, processes the data in batches,
@@ -361,3 +378,12 @@ class SteamStoreFetcher(BaseFetcher):
                 games.games = []
 
         db.close()
+
+
+# if __name__ == "__main__":
+# fetcher = SteamStoreFetcher()
+# fetcher.run()
+# fetcher = SteamSpyFetcher()
+# fetcher.run()
+# fetcher = SteamSpyMetadataFetcher()
+# fetcher.run()
