@@ -2,32 +2,25 @@ import os
 import time
 import warnings
 from abc import ABC, abstractmethod
-from functools import wraps
 from multiprocessing import Pool, cpu_count
 
 import requests
 from bs4 import BeautifulSoup
-from crud import (
-    bulk_ingest_meta_data,
-    bulk_ingest_steam_data,
-    bulk_ingest_steamspy_data,
-    flag_faulty_appid,
-    log_last_run_time,
-)
+from crud import bulk_ingest_meta_data, bulk_ingest_steam_data, bulk_ingest_steamspy_data, flag_faulty_appid
 from db import get_db
 from requests.exceptions import RequestException, SSLError
 from settings import Path, config, get_logger
 from sqlalchemy import text
 from tqdm import tqdm
-from validation import Game, GameDetails, GameDetailsList, GameList, GameMetaDataList, LastRun
+from utils import log_last_run
+from validation import Game, GameDetails, GameDetailsList, GameList, GameMetaDataList
 
-logger = get_logger(__file__)
 warnings.filterwarnings("ignore")
 
 
 class BaseFetcher(ABC):
     def __init__(self):
-        pass
+        self.base_logger = get_logger(__class__.__name__)
 
     def get_request(self, url: str, parameters=None, max_retries=4, wait_time=4, exponential_multiplier=4):
         """
@@ -46,7 +39,6 @@ class BaseFetcher(ABC):
         """
 
         try_count = 0
-
         while try_count < max_retries:
             try:
                 response = requests.get(url=url, params=parameters)
@@ -54,22 +46,24 @@ class BaseFetcher(ABC):
                     return response.json()
                 elif response.status_code == 429:
                     retry_after = int(response.headers.get("Retry-After", wait_time))
-                    logger.warning(f"Rate limited. Waiting for {retry_after} seconds...")
+                    self.base_logger.warning(f"Rate limited. Waiting for {retry_after} seconds...")
                     time.sleep(retry_after)
                 else:
-                    logger.info(f"Error: Request failed with status code {response.status_code}")
+                    self.base_logger.info(f"Error: Request failed with status code {response.status_code}")
                     return None
             except SSLError as e:
-                logger.error(f"SSL Error: {e}")
+                self.base_logger.error(f"SSL Error: {e}")
             except RequestException as e:
-                logger.exception(f"Request Exception: {e}")
+                self.base_logger.exception(f"Request Exception: {e}")
 
             try_count += 1
-            logger.info(f"Retrying ({try_count}/{max_retries}) in {wait_time} seconds...")
+            self.base_logger.info(f"Retrying ({try_count}/{max_retries}) in {wait_time} seconds...")
             time.sleep(wait_time)
             wait_time *= exponential_multiplier
 
-        logger.error(f"Failed to retrieve data from {url}?appids={parameters['appids']} after {max_retries} retries.")
+        self.base_logger.error(
+            f"Failed to retrieve data from {url}?appids={parameters['appids']} after {max_retries} retries."
+        )
 
         return None
 
@@ -77,23 +71,6 @@ class BaseFetcher(ABC):
         with open(os.path.join(Path.sql_queries, file_name), "r") as f:
             query = text(f.read())
         return query
-
-    @staticmethod
-    def log_last_run(scraper_name):
-        def decorator(func):
-            @wraps(func)
-            def wrapper(*args, **kwargs):
-                result = func(*args, **kwargs)
-
-                with get_db() as db:
-                    last_run = LastRun(scraper=scraper_name)
-                    log_last_run_time(last_run, db)
-
-                return result
-
-            return wrapper
-
-        return decorator
 
     @abstractmethod
     def run(self):
@@ -103,15 +80,17 @@ class BaseFetcher(ABC):
 class SteamSpyMetadataFetcher(BaseFetcher):
     def __init__(self, max_pages: int = 100):
         super().__init__()
+        self.logger = get_logger(__class__.__name__)
 
         self.max_pages = max_pages
         self.url = config.STEAMSPY_BASE_URL
 
-    @BaseFetcher.log_last_run(scraper_name="meta")
+    @log_last_run(scraper_name="meta")
     def run(self):
         """
         Fetches game metadata from SteamSpy API and stores it in a database.
         """
+        new_docs_added = 0
         with get_db() as db:
             for i in tqdm(range(self.max_pages)):
                 parameters = {"request": "all", "page": i}
@@ -121,12 +100,15 @@ class SteamSpyMetadataFetcher(BaseFetcher):
                     continue
 
                 games = GameMetaDataList(games=json_data.values())
-                bulk_ingest_meta_data(games, db)
+                new_docs_added += bulk_ingest_meta_data(games, db)
+
+        self.logger.info(f"Successfully added {new_docs_added} documents to the 'steamspy_games_metadata' table")
 
 
 class SteamSpyFetcher(BaseFetcher):
     def __init__(self, batch_size: int = 1000):
         super().__init__()
+        self.logger = get_logger(__class__.__name__)
 
         self.url = config.STEAMSPY_BASE_URL
         self.batch_size = batch_size
@@ -165,7 +147,7 @@ class SteamSpyFetcher(BaseFetcher):
 
         return GameDetailsList(games=app_data)
 
-    @BaseFetcher.log_last_run(scraper_name="steamspy")
+    @log_last_run(scraper_name="steamspy")
     def run(self):
         """
         Collects SteamSpy data for a list of app IDs in batches and ingests the data into a database.
@@ -173,23 +155,28 @@ class SteamSpyFetcher(BaseFetcher):
         Args:
             batch_size (int, optional): The number of app IDs to process in each batch. Defaults to 1000.
         """
+        new_docs_added = 0
+
         with get_db() as db:
             query = self.get_sql_query("steamspy_appid_dup.sql")
 
             result = db.execute(query)
             app_id_list = [row[0] for row in result.fetchall()]
-            logger.info(f"{len(app_id_list)} ID's found")
+            self.logger.info(f"{len(app_id_list)} ID's found")
 
             for i in tqdm(range(0, len(app_id_list), self.batch_size)):
                 batch = app_id_list[i : i + self.batch_size]
                 app_data = self.fetch_and_process_app_data(batch)
 
-                bulk_ingest_steamspy_data(app_data, db)
+                new_docs_added += bulk_ingest_steamspy_data(app_data, db)
+
+        self.logger.info(f"Successfully added {new_docs_added} documents to the 'steamspy_games_raw' table")
 
 
 class SteamStoreFetcher(BaseFetcher):
     def __init__(self, batch_size: int = 5, bulk_factor: int = 10, reverse: bool = False):
         super().__init__()
+        self.logger = get_logger(__class__.__name__)
 
         self.url = config.STEAM_BASE_SEARCH_URL
         self.batch_size = batch_size
@@ -220,7 +207,7 @@ class SteamStoreFetcher(BaseFetcher):
                 if data and appid == data.appid:
                     return data
 
-            logger.error(f"Could not find data for appid {appid} in Steam Store Database")
+            self.logger.error(f"Could not find data for appid {appid} in Steam Store Database")
 
             with get_db() as db:
                 flag_faulty_appid(appid, db)
@@ -309,7 +296,7 @@ class SteamStoreFetcher(BaseFetcher):
 
             return Game(**game_data)
         except KeyError as ke:
-            logger.error(f"KeyError parsing game data for `{data['steam_appid']}`: Missing key {ke}")
+            self.logger.error(f"KeyError parsing game data for `{data['steam_appid']}`: Missing key {ke}")
 
         return None
 
@@ -332,7 +319,7 @@ class SteamStoreFetcher(BaseFetcher):
             return app_data
         return None
 
-    @BaseFetcher.log_last_run(scraper_name="steam")
+    @log_last_run(scraper_name="steam")
     def run(self):
         """
         This command fetches unique app IDs from the Steam Store Database, processes the data in batches,
@@ -345,6 +332,8 @@ class SteamStoreFetcher(BaseFetcher):
         number of processed games reaches batch_size * bulk_factor. Default is 10.
         - reverse (bool): If set to True, the app IDs are processed in reverse order. Default is False.
         """
+        new_docs_added = 0
+
         # Create a database session
         with get_db() as db:
 
@@ -357,7 +346,7 @@ class SteamStoreFetcher(BaseFetcher):
             if self.reverse:
                 app_id_list.reverse()
 
-            logger.info(f"{len(app_id_list)} ID's found")
+            self.logger.info(f"{len(app_id_list)} ID's found")
 
             # Get the list of games batch them and insert into db
             games = GameList(games=[])
@@ -369,15 +358,20 @@ class SteamStoreFetcher(BaseFetcher):
                 if app_data:
                     games.games.extend(app_data)
 
-                if games.get_num_games() >= self.batch_size * self.bulk_factor:
-                    bulk_ingest_steam_data(games, db)
+                if (
+                    games.get_num_games() >= self.batch_size * self.bulk_factor
+                    or i == len(app_id_list) - self.batch_size
+                ):
+                    new_docs_added += bulk_ingest_steam_data(games, db)
                     games.games = []
 
+        self.logger.info(f"Successfully added {new_docs_added} documents to the 'steam_games_raw' table")
 
-if __name__ == "__main__":
-    # fetcher = SteamStoreFetcher()
-    # fetcher.run()
-    # fetcher = SteamSpyFetcher()
-    # fetcher.run()
-    fetcher = SteamSpyMetadataFetcher(max_pages=3)
-    fetcher.run()
+
+# if __name__ == "__main__":
+# fetcher = SteamStoreFetcher()
+# fetcher.run()
+# fetcher = SteamSpyFetcher()
+# fetcher.run()
+# fetcher = SteamSpyMetadataFetcher(max_pages=3)
+# fetcher.run()
