@@ -84,10 +84,11 @@ class BaseFetcher(ABC):
             @wraps(func)
             def wrapper(*args, **kwargs):
                 result = func(*args, **kwargs)
-                db = get_db()
-                last_run = LastRun(scraper=scraper_name)
-                log_last_run_time(last_run, db)
-                db.close()
+
+                with get_db() as db:
+                    last_run = LastRun(scraper=scraper_name)
+                    log_last_run_time(last_run, db)
+
                 return result
 
             return wrapper
@@ -111,18 +112,16 @@ class SteamSpyMetadataFetcher(BaseFetcher):
         """
         Fetches game metadata from SteamSpy API and stores it in a database.
         """
-        db = get_db()
-        for i in tqdm(range(self.max_pages)):
-            parameters = {"request": "all", "page": i}
-            json_data = self.get_request(self.url, parameters)
+        with get_db() as db:
+            for i in tqdm(range(self.max_pages)):
+                parameters = {"request": "all", "page": i}
+                json_data = self.get_request(self.url, parameters)
 
-            if json_data is None:
-                continue
+                if json_data is None:
+                    continue
 
-            games = GameMetaDataList(games=json_data.values())
-            bulk_ingest_meta_data(games, db)
-
-        db.close()
+                games = GameMetaDataList(games=json_data.values())
+                bulk_ingest_meta_data(games, db)
 
 
 class SteamSpyFetcher(BaseFetcher):
@@ -174,20 +173,18 @@ class SteamSpyFetcher(BaseFetcher):
         Args:
             batch_size (int, optional): The number of app IDs to process in each batch. Defaults to 1000.
         """
-        db = get_db()
-        query = self.get_sql_query("steamspy_appid_dup.sql")
+        with get_db() as db:
+            query = self.get_sql_query("steamspy_appid_dup.sql")
 
-        result = db.execute(query)
-        app_id_list = [row[0] for row in result.fetchall()]
-        logger.info(f"{len(app_id_list)} ID's found")
+            result = db.execute(query)
+            app_id_list = [row[0] for row in result.fetchall()]
+            logger.info(f"{len(app_id_list)} ID's found")
 
-        for i in tqdm(range(0, len(app_id_list), self.batch_size)):
-            batch = app_id_list[i : i + self.batch_size]
-            app_data = self.fetch_and_process_app_data(batch)
+            for i in tqdm(range(0, len(app_id_list), self.batch_size)):
+                batch = app_id_list[i : i + self.batch_size]
+                app_data = self.fetch_and_process_app_data(batch)
 
-            bulk_ingest_steamspy_data(app_data, db)
-
-        db.close()
+                bulk_ingest_steamspy_data(app_data, db)
 
 
 class SteamStoreFetcher(BaseFetcher):
@@ -225,9 +222,8 @@ class SteamStoreFetcher(BaseFetcher):
 
             logger.error(f"Could not find data for appid {appid} in Steam Store Database")
 
-            db = get_db()
-            flag_faulty_appid(appid, db)
-            db.close()
+            with get_db() as db:
+                flag_faulty_appid(appid, db)
 
         return None
 
@@ -350,40 +346,38 @@ class SteamStoreFetcher(BaseFetcher):
         - reverse (bool): If set to True, the app IDs are processed in reverse order. Default is False.
         """
         # Create a database session
-        db = get_db()
+        with get_db() as db:
 
-        # Query unique appids from the database
-        query = self.get_sql_query("steam_appid_dup.sql")
+            # Query unique appids from the database
+            query = self.get_sql_query("steam_appid_dup.sql")
 
-        result = db.execute(query)
-        app_id_list = [row[0] for row in result.fetchall()]
+            result = db.execute(query)
+            app_id_list = [row[0] for row in result.fetchall()]
 
-        if self.reverse:
-            app_id_list.reverse()
+            if self.reverse:
+                app_id_list.reverse()
 
-        logger.info(f"{len(app_id_list)} ID's found")
+            logger.info(f"{len(app_id_list)} ID's found")
 
-        # Get the list of games batch them and insert into db
-        games = GameList(games=[])
+            # Get the list of games batch them and insert into db
+            games = GameList(games=[])
 
-        for i in tqdm(range(0, len(app_id_list), self.batch_size)):
-            batch = app_id_list[i : i + self.batch_size]
-            app_data = self.fetch_and_process_app_data(batch)
+            for i in tqdm(range(0, len(app_id_list), self.batch_size)):
+                batch = app_id_list[i : i + self.batch_size]
+                app_data = self.fetch_and_process_app_data(batch)
 
-            if app_data:
-                games.games.extend(app_data)
+                if app_data:
+                    games.games.extend(app_data)
 
-            if games.get_num_games() >= self.batch_size * self.bulk_factor:
-                bulk_ingest_steam_data(games, db)
-                games.games = []
-
-        db.close()
+                if games.get_num_games() >= self.batch_size * self.bulk_factor:
+                    bulk_ingest_steam_data(games, db)
+                    games.games = []
 
 
-# if __name__ == "__main__":
-# fetcher = SteamStoreFetcher()
-# fetcher.run()
-# fetcher = SteamSpyFetcher()
-# fetcher.run()
-# fetcher = SteamSpyMetadataFetcher()
-# fetcher.run()
+if __name__ == "__main__":
+    # fetcher = SteamStoreFetcher()
+    # fetcher.run()
+    # fetcher = SteamSpyFetcher()
+    # fetcher.run()
+    fetcher = SteamSpyMetadataFetcher(max_pages=3)
+    fetcher.run()
