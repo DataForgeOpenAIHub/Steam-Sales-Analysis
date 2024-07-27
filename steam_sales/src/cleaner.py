@@ -7,17 +7,15 @@ from ast import literal_eval
 import dateparser
 import numpy as np
 import pandas as pd
-import tqdm
 from bs4 import BeautifulSoup
 from crud import bulk_ingest_clean_data
 from db import get_db
 from settings import Path, get_logger
 from sqlalchemy import text
+from tqdm import tqdm
 from validation import Clean, CleanList
 
 warnings.filterwarnings("ignore")
-
-logger = get_logger(__file__)
 
 
 class BaseCleaner(ABC):
@@ -108,7 +106,7 @@ class BaseCleaner(ABC):
         Returns:
             pd.DataFrame: The processed DataFrame.
         """
-        for func in tqdm.tqdm(process_functions, desc=f"Processing {df_name} DataFrame"):
+        for func in tqdm(process_functions, desc=f"Processing {df_name} DataFrame"):
             df = func(df)
         return df
 
@@ -117,6 +115,18 @@ class BaseCleaner(ABC):
         """
         This method is responsible for executing the cleaning process.
         It performs the necessary data cleaning operations on the dataset.
+
+        This method is currently unimplemented.
+        """
+        pass
+
+    @abstractmethod
+    def run(self):
+        """
+        This method is responsible for executing the cleaning process.
+        It performs the necessary data cleaning operations on the dataset.
+
+        This method is currently unimplemented.
         """
         pass
 
@@ -127,6 +137,9 @@ class SteamSpyCleaner(BaseCleaner):
     """
 
     def __init__(self):
+        super().__init__()
+        self.logger = get_logger(__class__.__name__)
+
         self.col_to_drop = [
             "score_rank",  # too many missing values
             "average_forever",
@@ -195,6 +208,14 @@ class SteamSpyCleaner(BaseCleaner):
         process_functions = [self.process_null, self.process_col_rows, self.process_owners, self.rename]
         return self.process_with_progress(df, process_functions, "SteamSpy")
 
+    def run(self):
+        steamspy_df = self.fetch_data("get_new_steamspy_data.sql")
+        self.logger.info(f"{steamspy_df.shape[0]} new records found")
+        cleaned_steamspy_df = self.process(steamspy_df)
+        cleaned_steamspy_df.drop(columns=["name"], inplace=True)
+        self.logger.info(f"Clean steamspy data shape: {cleaned_steamspy_df.shape}")
+        return cleaned_steamspy_df
+
 
 class SteamStoreCleaner(BaseCleaner):
     """
@@ -202,6 +223,9 @@ class SteamStoreCleaner(BaseCleaner):
     """
 
     def __init__(self):
+        super().__init__()
+        self.logger = get_logger(__class__.__name__)
+
         self.currency_rates = {"EUR": 1.08, "TWD": 0.03, "SGD": 0.74, "BRL": 0.18, "AUD": 0.67}
 
     def process_age(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -364,3 +388,44 @@ class SteamStoreCleaner(BaseCleaner):
             self.misc,
         ]
         return self.process_with_progress(df, process_functions, "Steam Store")
+
+    def run(self):
+        steam_df = self.fetch_data("get_new_steam_data.sql")
+        self.logger.info(f"{steam_df.shape[0]} new records found")
+        cleaned_steam_df = self.process(steam_df)
+        self.logger.info(f"Clean steam data shape: {cleaned_steam_df.shape}")
+        return cleaned_steam_df
+
+
+class SteamDataClean:
+    def __init__(self, batch_size: int = 1000):
+
+        self.batch_size = batch_size
+        self.logger = get_logger(__class__.__name__)
+
+    def merge(self):
+        steamspy_cleaner = SteamSpyCleaner()
+        steam_cleaner = SteamStoreCleaner()
+
+        steamspy_df = steamspy_cleaner.run()
+        steam_df = steam_cleaner.run()
+
+        merged_df = pd.merge(steamspy_df, steam_df, on="appid")
+        self.logger.info(f"Merged data shape: {merged_df.shape}")
+        return merged_df
+
+    def ingest(self):
+        merged_df = self.merge()
+
+        merged_df = np.array_split(merged_df, len(merged_df) // self.batch_size + 1)
+
+        with get_db() as db:
+            for chunk in tqdm(merged_df, desc="Batch progress"):
+                bulk_data = CleanList(games=[])
+                for i in range(chunk.shape[0]):
+                    data = chunk.iloc[i].to_dict()
+                    bulk_data.games.append(Clean(**data))
+
+                bulk_ingest_clean_data(bulk_data, db)
+
+        self.logger.info("Game data has been written to the database.")
