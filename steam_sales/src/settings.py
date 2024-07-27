@@ -51,7 +51,7 @@ def get_logger(name):
     ch.setLevel(logging.DEBUG)
 
     # Create a formatter and add it to the handler
-    formatter = logging.Formatter("%(message)s")
+    formatter = logging.Formatter("'%(name)s' - %(message)s")
     ch.setFormatter(formatter)
 
     # Create a file handler and set the level
