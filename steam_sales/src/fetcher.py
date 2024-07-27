@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore")
 
 class BaseFetcher(ABC):
     def __init__(self):
-        self.base_logger = get_logger(__class__.__name__)
+        self.base_logger = get_logger(name="BaseFetcher")
 
     def get_request(self, url: str, parameters=None, max_retries=4, wait_time=4, exponential_multiplier=4):
         """
@@ -53,8 +53,8 @@ class BaseFetcher(ABC):
                     return None
             except SSLError as e:
                 self.base_logger.error(f"SSL Error: {e}")
-            except RequestException as e:
-                self.base_logger.exception(f"Request Exception: {e}")
+            except RequestException:
+                self.base_logger.exception("Request Exception: No response from server")
 
             try_count += 1
             self.base_logger.info(f"Retrying ({try_count}/{max_retries}) in {wait_time} seconds...")
@@ -80,7 +80,7 @@ class BaseFetcher(ABC):
 class SteamSpyMetadataFetcher(BaseFetcher):
     def __init__(self, max_pages: int = 100):
         super().__init__()
-        self.logger = get_logger(__class__.__name__)
+        self.logger = get_logger(name="SteamSpyMetadataFetcher")
 
         self.max_pages = max_pages
         self.url = config.STEAMSPY_BASE_URL
@@ -108,7 +108,7 @@ class SteamSpyMetadataFetcher(BaseFetcher):
 class SteamSpyFetcher(BaseFetcher):
     def __init__(self, batch_size: int = 1000):
         super().__init__()
-        self.logger = get_logger(__class__.__name__)
+        self.logger = get_logger(name="SteamSpyFetcher")
 
         self.url = config.STEAMSPY_BASE_URL
         self.batch_size = batch_size
@@ -176,7 +176,7 @@ class SteamSpyFetcher(BaseFetcher):
 class SteamStoreFetcher(BaseFetcher):
     def __init__(self, batch_size: int = 5, bulk_factor: int = 10, reverse: bool = False):
         super().__init__()
-        self.logger = get_logger(__class__.__name__)
+        self.logger = get_logger(name="SteamStoreFetcher")
 
         self.url = config.STEAM_BASE_SEARCH_URL
         self.batch_size = batch_size
@@ -358,12 +358,13 @@ class SteamStoreFetcher(BaseFetcher):
                 if app_data:
                     games.games.extend(app_data)
 
-                if (
-                    games.get_num_games() >= self.batch_size * self.bulk_factor
-                    or i == len(app_id_list) - self.batch_size
-                ):
+                if games.get_num_games() >= self.batch_size * self.bulk_factor:
                     new_docs_added += bulk_ingest_steam_data(games, db)
                     games.games = []
+
+            # Additional check to process remaining records
+            if games.get_num_games() > 0:
+                new_docs_added += bulk_ingest_steam_data(games, db)
 
         self.logger.info(f"Successfully added {new_docs_added} documents to the 'steam_games_raw' table")
 
