@@ -138,7 +138,7 @@ class SteamSpyCleaner(BaseCleaner):
 
     def __init__(self):
         super().__init__()
-        self.logger = get_logger(__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
         self.col_to_drop = [
             "score_rank",  # too many missing values
@@ -224,7 +224,7 @@ class SteamStoreCleaner(BaseCleaner):
 
     def __init__(self):
         super().__init__()
-        self.logger = get_logger(__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
         self.currency_rates = {"EUR": 1.08, "TWD": 0.03, "SGD": 0.74, "BRL": 0.18, "AUD": 0.67}
 
@@ -401,7 +401,7 @@ class SteamDataClean:
     def __init__(self, batch_size: int = 1000):
 
         self.batch_size = batch_size
-        self.logger = get_logger(__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
     def merge(self):
         steamspy_cleaner = SteamSpyCleaner()
