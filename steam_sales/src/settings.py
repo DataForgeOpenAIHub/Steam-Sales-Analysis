@@ -47,7 +47,7 @@ def get_logger(name):
     logger.setLevel(logging.DEBUG)
 
     # Create a console handler and set the level
-    ch = RichHandler()
+    ch = RichHandler(rich_tracebacks=True)
     ch.setLevel(logging.DEBUG)
 
     # Create a formatter and add it to the handler
