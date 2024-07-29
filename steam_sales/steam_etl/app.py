@@ -11,7 +11,7 @@ app = typer.Typer(name="steamstore", help="CLI for Steam Store Data Ingestion ET
     name="fetch_steamspy_metadata",
     help="Fetch metadata from SteamSpy Database and ingest metadata into Custom Database",
 )
-def fetch_steamspy_metadata(max_pages: Annotated[int, typer.Option(help="Number of pages to fetch from.")]):
+def fetch_steamspy_metadata(max_pages: Annotated[int, typer.Option(help="Number of pages to fetch from.")] = 100):
     """
     Fetches game metadata from SteamSpy API and stores it in a database.
 
