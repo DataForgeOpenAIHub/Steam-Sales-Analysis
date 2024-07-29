@@ -1,8 +1,11 @@
+import os
+import sys
 from typing import Annotated
 
+sys.path.append(os.path.join(os.path.dirname(__file__), "steam_etl"))
+
 import typer
-from cleaner import SteamDataClean
-from fetcher import SteamSpyFetcher, SteamSpyMetadataFetcher, SteamStoreFetcher
+from steam_etl import SteamDataClean, SteamSpyFetcher, SteamSpyMetadataFetcher, SteamStoreFetcher
 
 app = typer.Typer(name="steamstore", help="CLI for Steam Store Data Ingestion ETL Pipeline")
 
