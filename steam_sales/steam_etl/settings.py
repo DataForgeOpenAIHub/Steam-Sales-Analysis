@@ -13,10 +13,8 @@ class Path:
     root_dir = os.path.dirname(package_dir)
 
     env_file = os.path.join(root_dir, ".env")
-    data_dir = os.path.join(root_dir, "data")
-    sql_queries = os.path.join(package_dir, "sql")
+    sql_queries = os.path.join(curr_file_dir, "sql")
     log_file = os.path.join(root_dir, "logs")
-    notebooks = os.path.join(package_dir, "notebooks")
 
     if not os.path.exists(log_file):
         os.mkdir(log_file)
@@ -76,5 +74,7 @@ def get_settings():
 
 config = get_settings()
 
-# print(Path.__dict__)
-# print(config.model_dump())
+# from pprint import pprint
+
+# pprint(Path.__dict__)
+# pprint(config.model_dump())

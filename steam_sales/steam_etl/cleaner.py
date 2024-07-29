@@ -8,7 +8,7 @@ import dateparser
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
-from crud import bulk_ingest_clean_data
+from .crud import bulk_ingest_clean_data
 from db import get_db
 from settings import Path, get_logger
 from sqlalchemy import text
