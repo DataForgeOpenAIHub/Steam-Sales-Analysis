@@ -1,6 +1,10 @@
 import re
+from functools import wraps
 
+from crud import log_last_run_time
+from db import get_db
 from settings import config
+from validation import LastRun
 
 
 def print_steam_links(df):
@@ -45,3 +49,20 @@ def check_na(df, column):
     filtered_rows = df[df[column].apply(is_na_like)]
 
     return filtered_rows
+
+
+def log_last_run(scraper_name):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+
+            with get_db() as db:
+                last_run = LastRun(scraper=scraper_name)
+                log_last_run_time(last_run, db)
+
+            return result
+
+        return wrapper
+
+    return decorator

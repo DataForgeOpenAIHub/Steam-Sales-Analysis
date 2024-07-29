@@ -3,7 +3,7 @@ from settings import get_logger
 from sqlalchemy.orm import Session
 from validation import CleanList, GameDetailsList, GameList, GameMetaDataList, LastRun
 
-logger = get_logger(__file__)
+logger = get_logger(__name__)
 
 
 def remove_duplicates_meta(all_data: GameMetaDataList, unique_games: list = []) -> GameMetaDataList:
@@ -52,9 +52,7 @@ def bulk_ingest_meta_data(requests: GameMetaDataList, db: Session):
 
     db.bulk_save_objects(new_docs)
     db.commit()
-
-    logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
-    return new_docs
+    return len(new_docs)
 
 
 def bulk_ingest_steamspy_data(requests: GameDetailsList, db: Session):
@@ -77,8 +75,7 @@ def bulk_ingest_steamspy_data(requests: GameDetailsList, db: Session):
     db.bulk_save_objects(new_docs)
     db.commit()
 
-    logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
-    return new_docs
+    return len(new_docs)
 
 
 def bulk_ingest_steam_data(requests: GameList, db: Session):
@@ -108,11 +105,11 @@ def bulk_ingest_steam_data(requests: GameList, db: Session):
         db.bulk_save_objects(new_docs)
         db.commit()
 
-        logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
-        return new_docs
+        # logger.info(f"Successfully added '{len(new_docs)}' documents to the database")
+        return len(new_docs)
     except Exception as e:
         logger.error(f"Failed to bulk ingest data: {e}")
-        return
+        return 0
 
 
 def game_exists(appid: str, db: Session):

@@ -202,7 +202,7 @@ class LastRun(BaseModel):
 
     @field_validator("scraper", mode="before")
     def validate_scraper(cls, v):
-        allowed = ["meta", "steamspy", "steam"]
+        allowed = ["meta", "steamspy", "steam", "cleaner"]
         if isinstance(v, str):
             if v in allowed:
                 return v.lower()

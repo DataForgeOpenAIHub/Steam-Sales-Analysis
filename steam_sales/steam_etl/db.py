@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from settings import config
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -31,11 +33,12 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 
+@contextmanager
 def get_db():
     db = SessionLocal()
     try:
         db.autoflush = True
         db.expire_on_commit = True
-        return db
+        yield db
     finally:
         db.close()
