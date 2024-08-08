@@ -1,5 +1,4 @@
 import json
-import os
 import warnings
 from abc import ABC, abstractmethod
 from ast import literal_eval
@@ -10,10 +9,10 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from crud import bulk_ingest_clean_data
 from db import get_db
-from settings import Path, get_logger
-from sqlalchemy import text
+from settings import get_logger
 from tqdm import tqdm
 from validation import Clean, CleanList
+from utils import get_sql_query
 
 warnings.filterwarnings("ignore")
 
@@ -26,20 +25,6 @@ class BaseCleaner(ABC):
     def __init__(self):
         pass
 
-    def get_sql_query(self, file_name: str):
-        """
-        Retrieves an SQL query from a file.
-
-        Args:
-            file_name (str): The name of the file containing the SQL query.
-
-        Returns:
-            sqlalchemy.sql.text.TextClause: The SQL query as a SQLAlchemy TextClause object.
-        """
-        with open(os.path.join(Path.sql_queries, file_name), "r") as f:
-            query = text(f.read())
-        return query
-
     def fetch_data(self, source: str) -> pd.DataFrame:
         """
         Fetches data from the specified source and returns it as a pandas DataFrame.
@@ -51,7 +36,7 @@ class BaseCleaner(ABC):
         - df (pd.DataFrame): The fetched data as a pandas DataFrame.
         """
         with get_db() as db:
-            query = self.get_sql_query(source)
+            query = get_sql_query(source)
             result = db.execute(query)
             data = result.fetchall()
             columns = result.keys()
