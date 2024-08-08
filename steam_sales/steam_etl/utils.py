@@ -69,6 +69,19 @@ def get_sql_query(file_name: str):
 
 
 def log_last_run(scraper_name):
+    """
+    Decorator function that logs the last run time of a function.
+    Args:
+        scraper_name (str): The name of the scraper.
+    Returns:
+        function: The decorated function.
+    Example:
+        @log_last_run("my_scraper")
+        def scrape_data():
+            # Function implementation
+            pass
+    """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
