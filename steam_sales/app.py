@@ -76,7 +76,7 @@ def clean_steam_data(
         - batch_size (int): The number of records to process in each batch. Default is 1000.
     """
     cleaner = SteamDataClean(batch_size=batch_size)
-    cleaner.run()
+    cleaner.ingest()
     typer.echo("Steam data cleaned successfully.")
 
 
