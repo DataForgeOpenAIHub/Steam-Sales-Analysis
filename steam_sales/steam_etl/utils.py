@@ -1,9 +1,11 @@
+import os
 import re
 from functools import wraps
 
 from crud import log_last_run_time
 from db import get_db
-from settings import config
+from settings import Path, config
+from sqlalchemy import text
 from validation import LastRun
 
 
@@ -49,6 +51,21 @@ def check_na(df, column):
     filtered_rows = df[df[column].apply(is_na_like)]
 
     return filtered_rows
+
+
+def get_sql_query(file_name: str):
+    """
+    Retrieves an SQL query from a file.
+
+    Args:
+        file_name (str): The name of the file containing the SQL query.
+
+    Returns:
+        sqlalchemy.sql.text.TextClause: The SQL query as a SQLAlchemy TextClause object.
+    """
+    with open(os.path.join(Path.sql_queries, file_name), "r") as f:
+        query = text(f.read())
+    return query
 
 
 def log_last_run(scraper_name):
