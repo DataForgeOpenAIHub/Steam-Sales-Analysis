@@ -4,7 +4,8 @@ from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from pydantic import BaseModel, Field, HttpUrl, field_validator
-from settings import get_logger
+
+from steam_sales.steam_etl.settings import get_logger
 
 logger = get_logger(__file__)
 

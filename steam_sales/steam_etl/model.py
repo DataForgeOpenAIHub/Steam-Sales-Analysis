@@ -1,6 +1,7 @@
-from db import Base, engine
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
 from sqlalchemy.dialects.mysql import JSON, LONGTEXT
+
+from steam_sales.steam_etl.db import Base, engine
 
 
 class GameDetails(Base):

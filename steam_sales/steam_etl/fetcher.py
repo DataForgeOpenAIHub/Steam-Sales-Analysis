@@ -6,14 +6,20 @@ from multiprocessing import Pool, cpu_count
 
 import requests
 from bs4 import BeautifulSoup
-from crud import bulk_ingest_meta_data, bulk_ingest_steam_data, bulk_ingest_steamspy_data, flag_faulty_appid
-from db import get_db
 from requests.exceptions import RequestException, SSLError
-from settings import Path, config, get_logger
 from sqlalchemy import text
 from tqdm import tqdm
-from utils import log_last_run
-from validation import Game, GameDetails, GameDetailsList, GameList, GameMetaDataList
+
+from steam_sales.steam_etl.crud import (
+    bulk_ingest_meta_data,
+    bulk_ingest_steam_data,
+    bulk_ingest_steamspy_data,
+    flag_faulty_appid,
+)
+from steam_sales.steam_etl.db import get_db
+from steam_sales.steam_etl.settings import Path, config, get_logger
+from steam_sales.steam_etl.utils import log_last_run
+from steam_sales.steam_etl.validation import Game, GameDetails, GameDetailsList, GameList, GameMetaDataList
 
 warnings.filterwarnings("ignore")
 

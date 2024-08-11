@@ -7,12 +7,13 @@ import dateparser
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
-from crud import bulk_ingest_clean_data
-from db import get_db
-from settings import get_logger
 from tqdm import tqdm
-from validation import Clean, CleanList
-from utils import get_sql_query
+
+from steam_sales.steam_etl.crud import bulk_ingest_clean_data
+from steam_sales.steam_etl.db import get_db
+from steam_sales.steam_etl.settings import get_logger
+from steam_sales.steam_etl.utils import get_sql_query
+from steam_sales.steam_etl.validation import Clean, CleanList
 
 warnings.filterwarnings("ignore")
 

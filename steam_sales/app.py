@@ -1,11 +1,7 @@
-import os
-import sys
 from typing import Annotated
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "steam_etl"))
-
 import typer
-from steam_etl import SteamDataClean, SteamSpyFetcher, SteamSpyMetadataFetcher, SteamStoreFetcher
+from steam_sales.steam_etl import SteamDataClean, SteamSpyFetcher, SteamSpyMetadataFetcher, SteamStoreFetcher
 
 app = typer.Typer(name="steamstore", help="CLI for Steam Store Data Ingestion ETL Pipeline")
 
@@ -65,7 +61,7 @@ def fetch_steamstore_data(
     typer.echo("SteamStore data fetched successfully.")
 
 
-@app.command(name="clean_steam_data", help="Clean the Steam Data in the Custom Database")
+@app.command(name="clean_steam_data", help="Clean the Steam Data and ingest into the Custom Database")
 def clean_steam_data(
     batch_size: Annotated[int, typer.Option(help="Number of records to process in each batch.")] = 1000,
 ):

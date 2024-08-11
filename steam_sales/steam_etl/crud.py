@@ -1,7 +1,8 @@
-import model
-from settings import get_logger
 from sqlalchemy.orm import Session
-from validation import CleanList, GameDetailsList, GameList, GameMetaDataList, LastRun
+
+from steam_sales.steam_etl import model
+from steam_sales.steam_etl.settings import get_logger
+from steam_sales.steam_etl.validation import CleanList, GameDetailsList, GameList, GameMetaDataList, LastRun
 
 logger = get_logger(__name__)
 
