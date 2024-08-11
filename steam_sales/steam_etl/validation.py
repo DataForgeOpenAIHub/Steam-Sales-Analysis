@@ -199,7 +199,7 @@ class CleanList(BaseModel):
 
 class LastRun(BaseModel):
     scraper: str = Field(..., description="Script executed")
-    last_run: Optional[datetime] = Field(datetime.now(timezone.utc), description="Last run time")
+    last_run: Optional[datetime] = Field(default_factory=get_current_utc_time, description="Last run time")
 
     @field_validator("scraper", mode="before")
     def validate_scraper(cls, v):
