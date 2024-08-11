@@ -36,6 +36,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install build
 
+    - name: List files for debugging
+      run: ls -R
+
     - name: Build package
       run: python -m build
 
