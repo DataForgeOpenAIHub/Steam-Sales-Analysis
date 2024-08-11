@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import versioneer
 
 
 # Function to parse requirements.txt
@@ -9,7 +10,8 @@ def parse_requirements(filename):
 
 setup(
     name="steam_sales",  # Name of your package
-    version="0.1.0",  # Initial release version
+    version=versioneer.get_version(),  # Initial release version
+    cmdclass=versioneer.get_cmdclass(),  # Command line version
     author="DataForgeOpenAIHub",
     packages=find_packages(),  # Automatically find and include all packages
     include_package_data=True,  # Include data files specified in MANIFEST.in
@@ -19,12 +21,15 @@ setup(
             "steamstore=steam_sales.app:app",
         ],
     },
+    license="MIT",  # License
     description="CLI for Steam Store Data Ingestion ETL Pipeline",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/DataForgeOpenAIHub/Steam-Sales-Analysis",  # Project URL
     classifiers=[
+        "Programming Language :: Python",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
