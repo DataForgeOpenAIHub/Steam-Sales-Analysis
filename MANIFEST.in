@@ -3,3 +3,5 @@ include LICENSE
 include steam_sales/steam_etl/sql/*.sql
 include versioneer.py
 include steam_sales/_version.py
+include requirements.txt
+include dev-requirements.txt
