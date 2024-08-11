@@ -19,7 +19,7 @@ def fetch_steamspy_metadata(max_pages: Annotated[int, typer.Option(help="Number 
     """
     fetcher = SteamSpyMetadataFetcher(max_pages=max_pages)
     fetcher.run()
-    typer.echo("SteamSpy metadata fetched successfully.")
+    typer.echo("SteamSpy metadata fetched successfully.", color=typer.colors.GREEN)
 
 
 @app.command(name="fetch_steamspy_data", help="Fetch from SteamSpy Database and ingest data into Custom Database")
@@ -34,7 +34,7 @@ def fetch_steamspy_data(
     """
     fetcher = SteamSpyFetcher(batch_size=batch_size)
     fetcher.run()
-    typer.echo("SteamSpy data fetched successfully.")
+    typer.echo("SteamSpy data fetched successfully.", color=typer.colors.GREEN)
 
 
 @app.command(name="fetch_steamstore_data", help="Fetch from Steam Store Database and ingest data into Custom Database")
@@ -58,7 +58,7 @@ def fetch_steamstore_data(
     """
     fetcher = SteamStoreFetcher(batch_size=batch_size, bulk_factor=bulk_factor, reverse=reverse)
     fetcher.run()
-    typer.echo("SteamStore data fetched successfully.")
+    typer.echo("SteamStore data fetched successfully.", color=typer.colors.GREEN)
 
 
 @app.command(name="clean_steam_data", help="Clean the Steam Data and ingest into the Custom Database")
@@ -73,7 +73,7 @@ def clean_steam_data(
     """
     cleaner = SteamDataClean(batch_size=batch_size)
     cleaner.ingest()
-    typer.echo("Steam data cleaned successfully.")
+    typer.echo("Steam data cleaned successfully.", color=typer.colors.GREEN)
 
 
 if __name__ == "__main__":
