@@ -1,4 +1,7 @@
-from setuptools import setup, find_packages
+import os
+
+from setuptools import find_packages, setup
+
 import versioneer
 
 
@@ -15,7 +18,9 @@ setup(
     author="DataForgeOpenAIHub",
     packages=find_packages(),  # Automatically find and include all packages
     include_package_data=True,  # Include data files specified in MANIFEST.in
-    install_requires=parse_requirements("requirements.txt"),  # Use requirements.txt
+    install_requires=parse_requirements(
+        os.path.join(os.path.dirname(__file__), "requirements.txt")
+    ),  # Use requirements.txt
     entry_points={
         "console_scripts": [
             "steamstore=steam_sales.app:app",
