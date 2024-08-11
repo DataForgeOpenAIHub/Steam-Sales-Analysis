@@ -173,7 +173,7 @@ def log_last_run_time(log: LastRun, db: Session):
         entry.update(log.model_dump())
 
     db.commit()
-    logger.info(f"Updated last run time for {log.scraper}")
+    logger.info(f"Updated last run time to '{log.last_run}' for worker '{log.scraper}'")
 
 
 def flag_faulty_appid(appid: int, db: Session):
