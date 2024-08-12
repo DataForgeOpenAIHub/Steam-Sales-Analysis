@@ -1,3 +1,41 @@
 [build-system]
 requires = ["setuptools>=64", "wheel", "versioneer-518"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "steamstore_etl"
+dynamic = ["version"]
+description = "CLI for Steam Store Data Ingestion ETL Pipeline"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "DataForgeOpenAIHub"}
+]
+urls = { "Homepage" = "https://github.com/DataForgeOpenAIHub/Steam-Sales-Analysis" }
+keywords = ["steam", "etl", "data-pipeline", "cli", "python"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Natural Language :: English"
+]
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "steam_sales/_version.py"
+versionfile_build = "steam_sales/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "steamstore_etl-"
