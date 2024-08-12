@@ -47,7 +47,7 @@ jobs:
 
     - name: Get Version from Versioneer
       id: version
-      run: echo "version=$(python -m versioneer get-version)"
+      run: echo "version=$(python get_version.py)" >> "$GITHUB_OUTPUT"
 
     - name: Create Git Tag
       run: |
@@ -85,7 +85,6 @@ jobs:
 
   publish-to-pypi:
     name: Publish to PyPI
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
     - create-tag
     runs-on: ubuntu-latest
