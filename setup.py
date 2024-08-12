@@ -12,7 +12,7 @@ def parse_requirements(filename):
 
 
 setup(
-    name="steam_sales",  # Name of your package
+    name="steamstore_etl",  # Name of your package
     version=versioneer.get_version(),  # Initial release version
     cmdclass=versioneer.get_cmdclass(),  # Command line version
     author="DataForgeOpenAIHub",
