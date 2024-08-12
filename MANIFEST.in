@@ -5,3 +5,4 @@ include versioneer.py
 include steam_sales/_version.py
 include requirements.txt
 include dev-requirements.txt
+include assets/*
