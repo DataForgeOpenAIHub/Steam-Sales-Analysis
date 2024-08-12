@@ -16,6 +16,9 @@ jobs:
     name: Build distribution 📦
     runs-on: ubuntu-latest
 
+    outputs:
+      new_tag: ${{ steps.tag_update_verification.outputs.new_tag }}
+
     steps:
     - uses: actions/checkout@v4
 
@@ -38,15 +41,13 @@ jobs:
         DRY_RUN: true
         DEFAULT_BUMP: ${{ github.event.pull_request.merged_at && 'minor' || 'patch' }}  # Minor bump for merges, patch otherwise
 
-    - name: echo new tag
+    - name: Tag Update Verification
+      id: tag_update_verification
       run: |
-        echo "The next tag version will be: ${{ steps.taggerDryRun.outputs.new_tag }}"
-    - name: echo tag
-      run: |
+        echo "new_tag=${{ steps.taggerDryRun.outputs.new_tag }}" >> "$GITHUB_OUTPUT"
         echo "The current tag is: ${{ steps.taggerDryRun.outputs.tag }}"
-    - name: echo part
-      run: |
         echo "The version increment was: ${{ steps.taggerDryRun.outputs.part }}"
+        echo "The next tag version will be: ${{ steps.taggerDryRun.outputs.new_tag }}"
 
     - name: Minor version for each merge
       id: taggerFinal
@@ -119,19 +120,20 @@ jobs:
       Sign the Python 🐍 distribution 📦 with Sigstore
       and upload them to GitHub Release
     needs:
+      - build
       - publish-to-testpypi
       - publish-to-pypi
     runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      new_tag: ${{needs.build.outputs.new_tag}}
 
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
       id-token: write  # IMPORTANT: mandatory for sigstore
 
     steps:
-    - name: Get Latest Tag
-      id: get_latest_tag
-      run: echo "latest_tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
-
     - name: Download all the dists
       uses: actions/download-artifact@v4
       with:
@@ -145,17 +147,13 @@ jobs:
           ./dist/*.tar.gz
           ./dist/*.whl
 
-    - name: Create GitHub Release
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+    - name: Create GitHub Release  
       run: >-
-        gh release create '${{ steps.get_latest_tag.outputs.latest_tag }}' --repo '${{ github.repository }}' --notes ""
+        gh release create $new_tag --repo '${{ github.repository }}' --notes ""
 
     - name: Upload artifact signatures to GitHub Release
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
       # Upload to GitHub Release using the `gh` CLI.
       # `dist/` contains the built packages, and the
       # sigstore-produced signatures and certificates.
       run: >-
-        gh release upload '${{ steps.get_latest_tag.outputs.latest_tag }}' dist/** --repo '${{ github.repository }}'
+        gh release upload $new_tag dist/** --repo '${{ github.repository }}'
