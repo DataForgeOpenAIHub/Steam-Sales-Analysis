@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'steam_sales/**'
+      - 'setup.py'
+      - 'pyproject.toml'
+      - 'MANIFEST.in'
+      - 'setup.cfg'
+      - 'requirements.txt'
   pull_request:
     types: [closed]  # To ensure it only runs on merged PRs
   workflow_dispatch:
