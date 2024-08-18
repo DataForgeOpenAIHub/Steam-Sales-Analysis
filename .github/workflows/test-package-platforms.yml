@@ -11,6 +11,13 @@ jobs:
     environment:
       name: package-test
 
+    env:
+        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+        MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+        MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+        MYSQL_DB_NAME: ${{ secrets.MYSQL_DB_NAME }}
+
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
