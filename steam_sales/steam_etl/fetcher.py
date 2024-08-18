@@ -45,9 +45,14 @@ class BaseFetcher(ABC):
         """
 
         try_count = 0
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/127.0.0.0 Safari/537.36"
+        }
         while try_count < max_retries:
             try:
-                response = requests.get(url=url, params=parameters)
+                response = requests.get(url=url, params=parameters, headers=headers)
                 if response.status_code == 200:
                     return response.json()
                 elif response.status_code == 429:
