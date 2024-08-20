@@ -7,6 +7,7 @@ import dateparser
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
+from deep_translator import GoogleTranslator
 from tqdm import tqdm
 
 from steam_sales.steam_etl.crud import bulk_ingest_clean_data
@@ -194,6 +195,7 @@ class SteamSpyCleaner(BaseCleaner):
 
     def run(self):
         steamspy_df = self.fetch_data("get_new_steamspy_data.sql")
+        # steamspy_df = self.fetch_data("get_all_steamspy_data.sql")
         self.logger.info(f"{steamspy_df.shape[0]} new records found")
         cleaned_steamspy_df = self.process(steamspy_df)
         cleaned_steamspy_df.drop(columns=["name"], inplace=True)
@@ -282,10 +284,20 @@ class SteamStoreCleaner(BaseCleaner):
         df.drop(columns=["is_free", "currency", "price_overview"], inplace=True)
         return df
 
+    @staticmethod
+    def translate(text):
+        try:
+            lang = GoogleTranslator(source="auto", target="en").translate(text)
+            return lang
+        except Exception as e:
+            return text
+
     def process_categories_and_genres(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df[(df["categories"].notna()) & (df["genres"].notna())]
         for col in ["categories", "genres"]:
             df[col] = df[col].apply(lambda x: ";".join(item["description"] for item in literal_eval(x)))
+        df.loc[df["english"] == 0, "genres"] = df.loc[df["english"] == 0, "genres"].apply(self.translate)
+        df.loc[df["english"] == 0, "categories"] = df.loc[df["english"] == 0, "categories"].apply(self.translate)
         return df
 
     def process_controller(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -374,6 +386,7 @@ class SteamStoreCleaner(BaseCleaner):
 
     def run(self):
         steam_df = self.fetch_data("get_new_steam_data.sql")
+        # steam_df = self.fetch_data("get_all_steam_data.sql")
         self.logger.info(f"{steam_df.shape[0]} new records found")
         cleaned_steam_df = self.process(steam_df)
         self.logger.info(f"Clean steam data shape: {cleaned_steam_df.shape}")
