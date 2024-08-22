@@ -7,80 +7,132 @@ Welcome to **Steam Sales Analysis** – an innovative project designed to harnes
 
 But we don’t stop there. The culmination of this data journey sees the information elegantly loaded into a MySQL database hosted on Aiven Cloud. From this solid foundation, we take it a step further: the data is analyzed and visualized through dynamic and interactive Tableau dashboards. This transforms raw numbers into actionable insights, offering a clear window into gaming trends and sales performance. Join us as we dive deep into the data and bring the world of gaming to life!
 
-# Setup Instructions
-
-## General Use Case
-
-For general use, setting up the environment and dependencies is straightforward:
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/DataForgeOpenAIHub/Steam-Sales-Analysis.git
-   cd steam-sales-analysis
-   ```
-2. **Install the package**:
-   ```bash
-   pip install .
-   ```
-
-3. **Configuration**:
-   - Create an `.env` file in the root directory of the repository.
-   - Add the following variables to the `.env` file:
-     ```ini
-     # Database configuration
-     MYSQL_USERNAME=<your_mysql_username>
-     MYSQL_PASSWORD=<your_mysql_password>
-     MYSQL_HOST=<your_mysql_host>
-     MYSQL_PORT=<your_mysql_port>
-     MYSQL_DB_NAME=<your_mysql_db_name>
-     ```
-
-## Development Setup
-
-For development purposes, you might need to have additional dependencies and tools:
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/DataForgeOpenAIHub/Steam-Sales-Analysis.git
-   cd steam-sales-analysis
-   ```
-
-2. **Create a virtual environment**:
-   - Using `venv`:
-     ```bash
-     python -m venv game
-     source game/bin/activate  # On Windows use `game\Scripts\activate`
-     ```
-   - Using `conda`:
-     ```bash
-     conda env create -f environment.yml
-     conda activate game
-     ```
-
-3. **Install dependencies**:
-   - Install general dependencies:
-     ```bash
-     pip install -r requirements.txt
-     ```
-   - Install development dependencies:
-     ```bash
-     pip install -r dev-requirements.txt
-     ```
-
-4. **Configuration**:
-   - Create an `.env` file in the root directory of the repository.
-   - Add the following variables to the `.env` file:
-     ```ini
-     # Database configuration
-     MYSQL_USERNAME=<your_mysql_username>
-     MYSQL_PASSWORD=<your_mysql_password>
-     MYSQL_HOST=<your_mysql_host>
-     MYSQL_PORT=<your_mysql_port>
-     MYSQL_DB_NAME=<your_mysql_db_name>
-     ```
-
 # `steamstore` CLI
 
-CLI for Steam Store Data Ingestion ETL Pipeline
+## Setup
+### Installing the package
+For general use, setting up the environment and dependencies is straightforward:
+
+```bash
+# Install the python distribution from PyPI
+pip install steamstore-etl
+```
+
+### Setting up the environment variables
+- Create an `.env` file in a directory.
+```ini
+# Database configuration
+MYSQL_USERNAME=<your_mysql_username>
+MYSQL_PASSWORD=<your_mysql_password>
+MYSQL_HOST=<your_mysql_host>
+MYSQL_PORT=<your_mysql_port>
+MYSQL_DB_NAME=<your_mysql_db_name>
+```
+- Open a terminal at the specified location
+
+   #### For Ubuntu (or other Unix-like systems)
+
+   1. **Load `.env` Variables into the Terminal**
+
+      To load the variables from the `.env` file into your current terminal session, you can use the `export` command along with the `dotenv` command if you have the `dotenv` utility installed. 
+
+      **Using `export` directly (manual method):**
+
+      ```bash
+      export $(grep -v '^#' .env | xargs)
+      ```
+
+      - `grep -v '^#' .env` removes any comments from the file.
+      - `xargs` converts the output into environment variable export commands.
+
+      **Using `dotenv` (requires installation):**
+
+      If you prefer a tool, you can use `dotenv`:
+
+      - Install `dotenv` if you don't have it:
+
+      ```bash
+      sudo apt-get install python3-dotenv
+      ```
+
+      - Then, use the following command to load the `.env` file:
+
+      ```bash
+      dotenv
+      ```
+
+      **Using `source` (not typical for `.env` but useful for `.sh` files):**
+
+      If your `.env` file is simple, you can use `source` directly (this method assumes no special parsing is needed):
+
+      ```bash
+      source .env
+      ```
+
+      Note that `source` works well if your `.env` file only contains simple `KEY=VALUE` pairs.
+
+   2. **Verify the Variables**
+
+      After loading, you can check that the environment variables are set:
+
+      ```bash
+      echo $MYSQL_USERNAME
+      ```
+
+   #### For Windows
+
+   1. **Load `.env` Variables into PowerShell**
+
+      You can use a PowerShell script to load the variables from the `.env` file.
+
+      **Create a PowerShell script (e.g., `load_env.ps1`):**
+
+      ```powershell
+      Get-Content .env | ForEach-Object {
+         if ($_ -match "^(.*?)=(.*)$") {
+            [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], [System.EnvironmentVariableTarget]::Process)
+         }
+      }
+      ```
+
+      - This script reads each line from the `.env` file and sets it as an environment variable for the current PowerShell session.
+
+      **Run the script:**
+
+      ```powershell
+      .\load_env.ps1
+      ```
+
+      **Verify the Variables:**
+
+      ```powershell
+      echo $env:MYSQL_USERNAME
+      ```
+
+   2. **Load `.env` Variables into Command Prompt**
+
+      The Command Prompt does not have built-in support for `.env` files. You can use a batch script to achieve this.
+
+      **Create a batch script (e.g., `load_env.bat`):**
+
+      ```batch
+      @echo off
+      for /f "tokens=1,2 delims==" %%A in (.env) do set %%A=%%B
+      ```
+
+      **Run the batch script:**
+
+      ```batch
+      load_env.bat
+      ```
+
+      **Verify the Variables:**
+
+      ```batch
+      echo %MYSQL_USERNAME%
+      ```
+
+## CLI for Steam Store Data Ingestion ETL Pipeline
 
 **Usage**:
 
@@ -163,6 +215,51 @@ $ steamstore fetch_steamstore_data [OPTIONS]
 - `--bulk-factor INTEGER`: Factor to determine when to perform a bulk insert (batch_size * bulk_factor).  [default: 10]
 - `--reverse / --no-reverse`: Process app IDs in reverse order.  [default: no-reverse]
 - `--help`: Show this message and exit.
+     
+# Setup Instructions
+## Development Setup
+
+For development purposes, you might need to have additional dependencies and tools:
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/DataForgeOpenAIHub/Steam-Sales-Analysis.git
+   cd steam-sales-analysis
+   ```
+
+2. **Create a virtual environment**:
+   - Using `venv`:
+     ```bash
+     python -m venv game
+     source game/bin/activate  # On Windows use `game\Scripts\activate`
+     ```
+   - Using `conda`:
+     ```bash
+     conda env create -f environment.yml
+     conda activate game
+     ```
+
+3. **Install dependencies**:
+   - Install general dependencies:
+     ```bash
+     pip install -r requirements.txt
+     ```
+   - Install development dependencies:
+     ```bash
+     pip install -r dev-requirements.txt
+     ```
+
+4. **Configuration**:
+   - Create an `.env` file in the root directory of the repository.
+   - Add the following variables to the `.env` file:
+     ```ini
+     # Database configuration
+     MYSQL_USERNAME=<your_mysql_username>
+     MYSQL_PASSWORD=<your_mysql_password>
+     MYSQL_HOST=<your_mysql_host>
+     MYSQL_PORT=<your_mysql_port>
+     MYSQL_DB_NAME=<your_mysql_db_name>
+     ```
 
 ## Database Integration
 
