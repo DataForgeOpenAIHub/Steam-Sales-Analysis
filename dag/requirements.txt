@@ -1,0 +1,3 @@
+prefect>=2.12.0
+steamstore_etl
+httpx
