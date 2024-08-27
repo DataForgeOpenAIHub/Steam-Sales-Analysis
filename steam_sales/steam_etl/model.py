@@ -92,6 +92,8 @@ class CleanData(Base):
     publisher = Column(Text, nullable=False)
     price = Column(Float, nullable=False)
     description = Column(LONGTEXT, nullable=False)
+    website = Column(Text, default="")
+    header_image = Column(Text, default="")
     year = Column(Integer, nullable=True)
     month = Column(Integer, nullable=True)
     day = Column(Integer, nullable=True)
