@@ -8,7 +8,7 @@ Welcome to **Steam Sales Analysis** – an innovative project designed to harnes
 But we don’t stop there. The culmination of this data journey sees the information elegantly loaded into a MySQL database hosted on Aiven Cloud. From this solid foundation, we take it a step further: the data is analyzed and visualized through dynamic and interactive Tableau dashboards. This transforms raw numbers into actionable insights, offering a clear window into gaming trends and sales performance. Join us as we dive deep into the data and bring the world of gaming to life!
 
 # `steamstore` CLI
-
+![banner](assets/imgs/steamstore-etl.drawio.png)
 ## Setup
 ### Installing the package
 For general use, setting up the environment and dependencies is straightforward:
