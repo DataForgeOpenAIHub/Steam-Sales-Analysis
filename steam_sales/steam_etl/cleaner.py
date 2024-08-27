@@ -347,13 +347,13 @@ class SteamStoreCleaner(BaseCleaner):
         df["description"] = df.apply(
             lambda row: (
                 f"{row['detailed_description']} {row['about_the_game']} {row['short_description']}"
-                f"Website: {row['website']} Game Image: {row['header_image']}"
+                # f"Website: {row['website']} Game Image: {row['header_image']}"
             ),
             axis=1,
         ).replace("", "Not available")
 
         df.drop(
-            columns=["detailed_description", "about_the_game", "short_description", "website", "header_image"],
+            columns=["detailed_description", "about_the_game", "short_description"],  # , "website", "header_image"],
             inplace=True,
         )
         return df
