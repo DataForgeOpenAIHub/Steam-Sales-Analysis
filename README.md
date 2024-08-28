@@ -1,6 +1,6 @@
 # Steam Sales Analysis
 
-![banner](assets/imgs/steam_logo.jpg)
+![banner](assets/imgs/steam_logo_banner.jpg)
 
 ## Overview
 Welcome to **Steam Sales Analysis** – an innovative project designed to harness the power of data for insights into the gaming world. We have meticulously crafted an ETL (Extract, Transform, Load) pipeline that covers every essential step: data retrieval, processing, validation, and ingestion. By leveraging the robust Steamspy and Steam APIs, we collect comprehensive game-related metadata, details, and sales figures.
@@ -8,6 +8,7 @@ Welcome to **Steam Sales Analysis** – an innovative project designed to harnes
 But we don’t stop there. The culmination of this data journey sees the information elegantly loaded into a MySQL database hosted on Aiven Cloud. From this solid foundation, we take it a step further: the data is analyzed and visualized through dynamic and interactive Tableau dashboards. This transforms raw numbers into actionable insights, offering a clear window into gaming trends and sales performance. Join us as we dive deep into the data and bring the world of gaming to life!
 
 # `steamstore` CLI
+![Steamstore ETL Pipeline](assets/imgs/steamstore-etl.drawio.png)
 
 ## Setup
 ### Installing the package
