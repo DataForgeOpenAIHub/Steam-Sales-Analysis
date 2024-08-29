@@ -289,7 +289,7 @@ class SteamStoreCleaner(BaseCleaner):
         try:
             lang = GoogleTranslator(source="auto", target="en").translate(text)
             return lang
-        except Exception as e:
+        except Exception:
             return text
 
     def process_categories_and_genres(self, df: pd.DataFrame) -> pd.DataFrame:
