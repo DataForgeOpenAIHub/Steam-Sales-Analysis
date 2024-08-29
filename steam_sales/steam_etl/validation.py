@@ -158,6 +158,8 @@ class Clean(BaseModel):
     publisher: str = Field(..., description="Publisher of the game")
     price: float = Field(..., description="Current price of the game")
     description: str = Field(..., description="Description of the game")
+    website: Optional[HttpUrl | str] = Field(..., description="Official website of the game")
+    header_image: HttpUrl = Field(..., description="URL to the header image of the game")
     year: Optional[int] = Field(None, description="Year of the game release")
     month: Optional[int] = Field(None, description="Month of the game release")
     day: Optional[int] = Field(None, description="Day of the game release")
