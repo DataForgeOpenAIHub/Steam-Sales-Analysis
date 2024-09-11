@@ -291,6 +291,11 @@ To execute the ETL pipeline, use the following commands:
 
 This will start the process of retrieving data from the Steamspy and Steam APIs, processing and validating it, and then loading it into the MySQL database.
 
+## Authors
+1. [Kayvan Shah](https://github.com/KayvanShah1) | `MS in Applied Data Science` | `USC`
+2. [Sudarshana Rao](https://github.com/SudarshanaSRao) | `MS in Electrical Engineering (Machine Learning & Data Science)` | `USC`
+3. [Rohit Veeradhi](https://github.com/Rohit04121998) | `MS in Electrical Engineering (Machine Learning & Data Science)` | `USC`
+
 ## References:
 
 ### API Used:
