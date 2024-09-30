@@ -291,8 +291,8 @@ To execute the ETL pipeline, use the following commands:
 
 This will start the process of retrieving data from the Steamspy and Steam APIs, processing and validating it, and then loading it into the MySQL database.
 
-# Tableau dashboard
-## Explore the [interactive dashboard](https://public.tableau.com/app/profile/sudarshana.sudheendra.rao/viz/SteamAnalysis_17254061314020/Dashboard4).
+# Dashboard
+## Explore the [interactive Tableau dashboard](https://public.tableau.com/app/profile/sudarshana.sudheendra.rao/viz/SteamAnalysis_17254061314020/Dashboard4).
 
 ## Authors
 1. [Kayvan Shah](https://github.com/KayvanShah1) | `MS in Applied Data Science` | `USC`
