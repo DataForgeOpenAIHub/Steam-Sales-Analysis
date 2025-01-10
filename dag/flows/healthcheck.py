@@ -1,7 +1,8 @@
 import platform
-import prefect
-from prefect import task, flow, get_run_logger
 import sys
+
+import prefect
+from prefect import flow, get_run_logger, task
 
 
 @task

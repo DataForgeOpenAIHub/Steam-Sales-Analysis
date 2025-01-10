@@ -1,6 +1,7 @@
 from typing import Annotated
 
 import typer
+
 from steam_sales.steam_etl import SteamDataClean, SteamSpyFetcher, SteamSpyMetadataFetcher, SteamStoreFetcher
 
 app = typer.Typer(name="steamstore", help="CLI for Steam Store Data Ingestion ETL Pipeline")
