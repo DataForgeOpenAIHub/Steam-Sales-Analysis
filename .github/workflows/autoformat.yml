@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r dev-requirements.txt
+          pip install black black[jupyter] flake8 isort nbstripout pytest pytest-timeout versioneer
 
       - name: Check import sorting with isort
         id: isort-check
