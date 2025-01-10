@@ -1,11 +1,16 @@
 # Steam Sales Analysis
+[![Package Publish Status](https://img.shields.io/github/actions/workflow/status/DataForgeOpenAIHub/Steam-Sales-Analysis/python-publish.yml?branch=main)](https://github.com/DataForgeOpenAIHub/Steam-Sales-Analysis/actions)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/steamstore_etl)](https://pypi.org/project/steamstore_etl/)
+[![PyPI Python Version](https://img.shields.io/pypi/pyversions/steamstore_etl)](https://pypi.org/project/steamstore_etl/)
+[![PyPI version](https://img.shields.io/pypi/v/steamstore_etl.svg)](https://pypi.org/project/steamstore_etl/)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/DataForgeOpenAIHub/Steam-Sales-Analysis)
 
 ![banner](assets/imgs/steam_logo_banner.jpg)
 
 ## Overview
 Welcome to **Steam Sales Analysis** – an innovative project designed to harness the power of data for insights into the gaming world. We have meticulously crafted an ETL (Extract, Transform, Load) pipeline that covers every essential step: data retrieval, processing, validation, and ingestion. By leveraging the robust Steamspy and Steam APIs, we collect comprehensive game-related metadata, details, and sales figures.
 
-But we don’t stop there. The culmination of this data journey sees the information elegantly loaded into a MySQL database hosted on Aiven Cloud. From this solid foundation, we take it a step further: the data is analyzed and visualized through dynamic and interactive Tableau dashboards. This transforms raw numbers into actionable insights, offering a clear window into gaming trends and sales performance. Join us as we dive deep into the data and bring the world of gaming to life!
+But we don’t stop there. The culmination of this data journey is the elegant loading of information into a MySQL database hosted on Aiven Cloud. From this solid foundation, we take it a step further: the data is analyzed and visualized through dynamic and interactive Tableau dashboards. This transforms raw numbers into actionable insights, offering a clear window into gaming trends and sales performance. Join us as we dive deep into the data and bring the world of gaming to life!
 
 # `steamstore` CLI
 ![Steamstore ETL Pipeline](assets/imgs/steamstore-etl.drawio.png)
